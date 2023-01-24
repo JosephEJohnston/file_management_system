@@ -1,40 +1,36 @@
 package com.noob.model.bo;
 
+import com.noob.model.po.FilePO;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @ToString
 public class ManagedFile {
+    private Long id;
 
-    private boolean underManaged;
+    private String name;
 
-    private File file;
+    private String fullPath;
 
-    private final List<Tag> tagList;
+    private Integer type;
+
+    private List<Tag> tagList;
 
     private ManagedFile() {
-        tagList = new ArrayList<>();
+
     }
 
-    public static ManagedFile of(File file, List<Tag> tagList) {
-        ManagedFile bo = new ManagedFile();
+    public static ManagedFile of(FilePO po) {
+        ManagedFile managedFile = new ManagedFile();
 
-        bo.setFile(file);
-        bo.addTag(tagList);
+        BeanUtils.copyProperties(po, managedFile);
 
-        return bo;
-    }
-
-    private void setFile(File file) {
-        this.file = file;
-    }
-
-    public void addTag(List<Tag> tagList) {
-        getTagList().addAll(tagList);
+        return managedFile;
     }
 }

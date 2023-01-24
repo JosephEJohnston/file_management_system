@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/file_management
+#    url: jdbc:h2:tcp://localhost/~/file_management
+    url: jdbc:h2:file:~/.file_management/file_management
     username: sa
     password:
     driver-class-name: org.h2.Driver

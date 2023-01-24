@@ -1,18 +1,16 @@
 package com.noob.controller;
 
 import com.noob.model.bo.ManagedFile;
-import com.noob.model.bo.Tag;
-import com.noob.service.dao.FileService;
+import com.noob.model.bo.SystemFile;
+import com.noob.service.biz.FileBiz;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -21,8 +19,6 @@ import org.springframework.stereotype.Controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -30,35 +26,39 @@ import java.util.ResourceBundle;
 public class MainSceneController implements Initializable {
 
     @Autowired
-    private FileService fileService;
+    private FileBiz fileBiz;
 
     @FXML
     private TextField pathTextField;
 
     @FXML
-    private TreeView<ManagedFile> fileTreeView;
+    private TreeView<SystemFile> fileTreeView;
 
     @FXML
-    private Label currentFileNameLabel;
+    private Label curFileNameLabel;
 
     @FXML
-    private FlowPane currentFilePane;
+    private FlowPane curFilePane;
 
-    private String directory_icon_url;
+    @FXML
+    private Label curFileStatusLabel;
+
+    private String directoryIconUrl;
+
+    private SystemFile curSelectedFile;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Resource resource = new ClassPathResource("static/picture/folder_icon.png");
         try {
-            directory_icon_url = resource.getURL().toString();
+            directoryIconUrl = resource.getURL().toString();
         } catch (IOException ignore) {
 
         }
 
-        fileService.test().forEach(System.out::println);
     }
 
-    public void changeDirectory(ActionEvent event) {
+    public void searchDirectory(ActionEvent event) {
         String directoryPath = pathTextField.getText();
 
         File directory = new File(directoryPath);
@@ -71,41 +71,66 @@ public class MainSceneController implements Initializable {
             return;
         }
 
-        TreeItem<ManagedFile> rootItem = new TreeItem<>(ManagedFile.of(directory, Collections.emptyList()),
-                new ImageView(new Image(directory_icon_url)));
-        List<File> fileList = new ArrayList<>(List.of(files));
+        fileTreeView.setRoot(makeRootTree(directory));
+    }
 
-        fileList.forEach(file -> {
-            TreeItem<ManagedFile> treeItem = new TreeItem<>(
-                    ManagedFile.of(file, List.of(Tag.of("test_tag"))));
-            rootItem.getChildren().add(treeItem);
-        });
+    private TreeItem<SystemFile> makeRootTree(File directory) {
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return new TreeItem<>();
+        }
 
-        fileTreeView.setRoot(rootItem);
+        Pair<SystemFile, List<SystemFile>> pair = fileBiz
+                .renderSystemFileDirectory(directory);
 
+        TreeItem<SystemFile> rootItem = new TreeItem<>(
+                pair.getLeft(),
+                new ImageView(new Image(directoryIconUrl))
+        );
+
+        pair.getRight().forEach(file -> rootItem
+                .getChildren().add(new TreeItem<>(file)));
+
+        return rootItem;
     }
 
     public void selectItem() {
-        TreeItem<ManagedFile> item = fileTreeView.getSelectionModel().getSelectedItem();
-        currentFilePane.getChildren().clear();
+        TreeItem<SystemFile> item = fileTreeView.getSelectionModel().getSelectedItem();
+        curFilePane.getChildren().clear();
 
         if (item != null) {
-            ManagedFile managedFile = item.getValue();
+            SystemFile systemFile = item.getValue();
+            curSelectedFile = systemFile;
 
-            currentFileNameLabel.setText(managedFile.getFile().getName());
+            curFileNameLabel.setText(systemFile.getFile().getName());
 
-            List<Tag> tagList = managedFile.getTagList();
+            ManagedFile managedFile = systemFile.getManagedFile();
+            if (managedFile == null) {
+                curFileStatusLabel.setText("NO");
+            } else {
+                curFileStatusLabel.setText("YES");
+            }
 
-            List<Label> tagLabelList = tagList.stream()
+            /*List<Button> tagLabelList = tagList.stream()
                     .map(tag -> {
-                        Label label = new Label(tag.getName());
-                        label.setMinWidth(50);
-                        label.setMinHeight(50);
+                        Button button = new Button(tag.getName());
+                        button.setMinWidth(50);
+                        button.setMinHeight(50);
 
-                        return label;
+                        return button;
                     }).toList();
 
-            currentFilePane.getChildren().addAll(tagLabelList);
+            currentFilePane.getChildren().addAll(tagLabelList);*/
         }
+    }
+
+    public void manageFile() {
+        if (curSelectedFile == null) {
+            return;
+        }
+
+        ManagedFile managedFile = fileBiz.addManagedFile(curSelectedFile.getFile());
+        curSelectedFile.setManagedFile(managedFile);
+        curFileStatusLabel.setText("YES");
     }
 }
