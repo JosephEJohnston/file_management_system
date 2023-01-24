@@ -1,3 +1,5 @@
+package com.noob;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

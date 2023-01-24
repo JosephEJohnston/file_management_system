@@ -2,6 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.0.1</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
   <groupId>com.noob</groupId>
   <artifactId>file_management_system</artifactId>
   <version>1.0-SNAPSHOT</version>
@@ -15,9 +22,15 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javafx.version>19</javafx.version>
     <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
+    <springboot.version>3.0.1</springboot.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>${springboot.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -43,6 +56,15 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <executable>
+            true
+          </executable>
+        </configuration>
+      </plugin>
+      <!--<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.10.1</version>
@@ -50,15 +72,15 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
         </configuration>
-      </plugin>
-      <plugin>
+      </plugin>-->
+      <!--<plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
         <version>${javafx.maven.plugin.version}</version>
         <configuration>
-          <mainClass>Main</mainClass>
+          <mainClass>com.noob.Main</mainClass>
         </configuration>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 
