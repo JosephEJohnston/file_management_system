@@ -6,9 +6,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -17,7 +17,12 @@ import java.io.IOException;
 @SpringBootApplication
 public class MainIndex extends Application {
 
+    private static ConfigurableApplicationContext applicationContext;
+
+    private static String[] args;
+
     public static void main(String[] args) {
+        MainIndex.args = args;
         launch(args);
     }
 
@@ -29,6 +34,8 @@ public class MainIndex extends Application {
     private void startStage(Stage primaryStage) throws IOException {
         Resource resource = new ClassPathResource("fxml/IndexScene.fxml");
         FXMLLoader loader = new FXMLLoader(resource.getURL());
+        loader.setControllerFactory(param -> applicationContext.getBean(param));
+
         Parent root = loader.load();
         Scene scene = new Scene(root);
 
@@ -42,13 +49,12 @@ public class MainIndex extends Application {
     }
 
     @Override
-    public void init() throws Exception {
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(MainIndex.class);
-        builder.application().setWebApplicationType(WebApplicationType.NONE);
+    public void init() {
+        applicationContext = SpringApplication.run(MainIndex.class, args);
     }
 
     @Override
     public void stop() throws Exception {
-
+        applicationContext.close();
     }
 }

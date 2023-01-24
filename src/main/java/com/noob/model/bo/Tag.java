@@ -1,4 +1,4 @@
-package com.noob.model.bo.tag;
+package com.noob.model.bo;
 
 import lombok.Getter;
 import lombok.Setter;

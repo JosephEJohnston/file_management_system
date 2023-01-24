@@ -1,6 +1,5 @@
-package com.noob.model.bo.file;
+package com.noob.model.bo;
 
-import com.noob.model.bo.tag.Tag;
 import lombok.Getter;
 import lombok.ToString;
 

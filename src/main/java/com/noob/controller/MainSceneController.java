@@ -1,7 +1,8 @@
-package com.noob.controller.index;
+package com.noob.controller;
 
-import com.noob.model.bo.file.ManagedFile;
-import com.noob.model.bo.tag.Tag;
+import com.noob.model.bo.ManagedFile;
+import com.noob.model.bo.Tag;
+import com.noob.service.dao.FileService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,9 @@ import java.util.ResourceBundle;
 
 @Controller
 public class MainSceneController implements Initializable {
+
+    @Autowired
+    private FileService fileService;
 
     @FXML
     private TextField pathTextField;
@@ -49,6 +54,8 @@ public class MainSceneController implements Initializable {
         } catch (IOException ignore) {
 
         }
+
+        fileService.test().forEach(System.out::println);
     }
 
     public void changeDirectory(ActionEvent event) {
