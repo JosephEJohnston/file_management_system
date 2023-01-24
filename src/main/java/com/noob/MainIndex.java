@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 
 @SpringBootApplication
-public class Main extends Application {
+public class MainIndex extends Application {
 
     public static void main(String[] args) {
         launch(args);
@@ -27,7 +27,7 @@ public class Main extends Application {
     }
 
     private void startStage(Stage primaryStage) throws IOException {
-        Resource resource = new ClassPathResource("fxml/MainScene.fxml");
+        Resource resource = new ClassPathResource("fxml/IndexScene.fxml");
         FXMLLoader loader = new FXMLLoader(resource.getURL());
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -43,7 +43,7 @@ public class Main extends Application {
 
     @Override
     public void init() throws Exception {
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(Main.class);
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(MainIndex.class);
         builder.application().setWebApplicationType(WebApplicationType.NONE);
     }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.noob.controller.index.MainSceneController">
+   <children>
+      <TextField fx:id="pathTextField" onAction="#changeDirectory" prefHeight="30.0" prefWidth="600.0" />
+      <TreeView fx:id="fileTreeView" layoutY="30.0" onMouseClicked="#selectItem" prefHeight="250.0" prefWidth="400.0" />
+      <Label fx:id="currentFileNameLabel" alignment="CENTER" layoutX="400.0" layoutY="30.0" prefHeight="25.0" prefWidth="200.0" text="-">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
+      <FlowPane fx:id="currentFilePane" layoutX="400.0" layoutY="55.0" prefHeight="225.0" prefWidth="200.0" style="-fx-background-color: yellow;" />
+   </children>
+</AnchorPane>
