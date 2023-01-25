@@ -1,8 +1,10 @@
 package com.noob.model.bo;
 
+import com.noob.model.po.TagPO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.beans.BeanUtils;
 
 
 @Getter
@@ -22,5 +24,13 @@ public class Tag {
         bo.setName(name);
 
         return bo;
+    }
+
+    public static Tag of(TagPO po) {
+        Tag tag = new Tag();
+
+        BeanUtils.copyProperties(po, tag);
+
+        return tag;
     }
 }

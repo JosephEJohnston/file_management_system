@@ -3,6 +3,7 @@ package com.noob.controller;
 import com.noob.model.bo.SystemFile;
 import com.noob.model.bo.SystemNormalFile;
 import com.noob.model.bo.SystemNotManagedFile;
+import com.noob.model.bo.Tag;
 import com.noob.service.biz.FileBiz;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -104,23 +105,23 @@ public class MainSceneController implements Initializable {
 
             curFileNameLabel.setText(systemFile.getFile().getName());
 
-            if (systemFile instanceof SystemNormalFile) {
+            if (systemFile instanceof SystemNormalFile normalFile) {
                 curFileStatusLabel.setText("YES");
+
+                List<Tag> tagList = normalFile.getManagedFile().getTagList();
+                List<Button> tagLabelList = tagList.stream()
+                        .map(tag -> {
+                            Button button = new Button(tag.getName());
+                            button.setMinWidth(50);
+                            button.setMinHeight(30);
+
+                            return button;
+                        }).toList();
+
+                curFilePane.getChildren().addAll(tagLabelList);
             } else {
                 curFileStatusLabel.setText("NO");
             }
-
-
-            /*List<Button> tagLabelList = tagList.stream()
-                    .map(tag -> {
-                        Button button = new Button(tag.getName());
-                        button.setMinWidth(50);
-                        button.setMinHeight(50);
-
-                        return button;
-                    }).toList();
-
-            currentFilePane.getChildren().addAll(tagLabelList);*/
         }
     }
 

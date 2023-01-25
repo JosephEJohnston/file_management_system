@@ -1,12 +1,11 @@
 package com.noob.service.biz.impl;
 
-import com.noob.model.bo.ManagedFile;
-import com.noob.model.bo.SystemFile;
-import com.noob.model.bo.SystemNormalFile;
-import com.noob.model.bo.SystemNotManagedFile;
+import com.noob.model.bo.*;
 import com.noob.model.po.FilePO;
+import com.noob.model.po.TagPO;
 import com.noob.service.biz.RenderSystemFileDirectoryBiz;
 import com.noob.service.dao.FileService;
+import com.noob.service.dao.TagEntityService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -26,12 +25,20 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
     @Resource
     private FileService fileService;
 
+    @Resource
+    private TagEntityService tagEntityService;
+
     private final File directory;
 
     private List<File> fileList;
 
     private List<FilePO> filePOList;
 
+    private Map<Long, List<TagPO>> entityIdToTagMap;
+
+    /**
+     * Map[name, Map[fullPath, file]]
+     */
     private Map<String, Map<String, ManagedFile>> managedMap;
 
     private SystemNotManagedFile directorySystemFile;
@@ -46,6 +53,7 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
     public RenderSystemFileDirectoryBizImpl init() {
         initFileList();
         initFilePoList();
+        initTagMap();
         initManagedMap();
 
         return this;
@@ -66,6 +74,13 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
                 .map(File::getName).toList();
 
         this.filePOList = fileService.selectByNameList(fileNameList);
+    }
+
+    private void initTagMap() {
+        List<Long> fileIdList = filePOList.stream()
+                .map(FilePO::getId).toList();
+
+        this.entityIdToTagMap = tagEntityService.selectTagByEntityId(fileIdList);
     }
 
     private void initManagedMap() {
@@ -107,8 +122,14 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
     }
 
     private void renderSystemFileTag(SystemFile file) {
-        if (file instanceof SystemNormalFile) {
-            System.out.println();
+        if (file instanceof SystemNormalFile normalFile) {
+            ManagedFile managedFile = normalFile.getManagedFile();
+
+            List<Tag> tagList = entityIdToTagMap
+                    .getOrDefault(managedFile.getId(), Collections.emptyList())
+                    .stream().map(Tag::of).toList();
+
+            managedFile.setTagList(tagList);
         }
     }
 

@@ -18,9 +18,9 @@ public class TagRelationPO {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long tag_id;
+    private Long tagId;
 
-    private Long entity_id;
+    private Long entityId;
 
     private Integer status;
 
