@@ -1,7 +1,8 @@
 package com.noob.controller;
 
-import com.noob.model.bo.ManagedFile;
 import com.noob.model.bo.SystemFile;
+import com.noob.model.bo.SystemNormalFile;
+import com.noob.model.bo.SystemNotManagedFile;
 import com.noob.service.biz.FileBiz;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -55,7 +56,6 @@ public class MainSceneController implements Initializable {
         } catch (IOException ignore) {
 
         }
-
     }
 
     public void searchDirectory(ActionEvent event) {
@@ -80,7 +80,7 @@ public class MainSceneController implements Initializable {
             return new TreeItem<>();
         }
 
-        Pair<SystemFile, List<SystemFile>> pair = fileBiz
+        Pair<SystemNotManagedFile, List<SystemFile>> pair = fileBiz
                 .renderSystemFileDirectory(directory);
 
         TreeItem<SystemFile> rootItem = new TreeItem<>(
@@ -104,12 +104,12 @@ public class MainSceneController implements Initializable {
 
             curFileNameLabel.setText(systemFile.getFile().getName());
 
-            ManagedFile managedFile = systemFile.getManagedFile();
-            if (managedFile == null) {
-                curFileStatusLabel.setText("NO");
-            } else {
+            if (systemFile instanceof SystemNormalFile) {
                 curFileStatusLabel.setText("YES");
+            } else {
+                curFileStatusLabel.setText("NO");
             }
+
 
             /*List<Button> tagLabelList = tagList.stream()
                     .map(tag -> {
@@ -125,12 +125,20 @@ public class MainSceneController implements Initializable {
     }
 
     public void manageFile() {
-        if (curSelectedFile == null) {
+        if (curSelectedFile == null || curSelectedFile.getFile().isDirectory()) {
             return;
         }
 
-        ManagedFile managedFile = fileBiz.addManagedFile(curSelectedFile.getFile());
-        curSelectedFile.setManagedFile(managedFile);
-        curFileStatusLabel.setText("YES");
+        SystemFile newSystemFile = fileBiz.addManagedFile(curSelectedFile.getFile())
+                .map(managedFile -> (SystemFile) SystemNormalFile
+                        .of(curSelectedFile.getFile(), managedFile))
+                .orElse(SystemNotManagedFile.of(curSelectedFile.getFile()));
+
+        if (newSystemFile instanceof SystemNormalFile) {
+            curFileStatusLabel.setText("YES");
+
+            TreeItem<SystemFile> item = fileTreeView.getSelectionModel().getSelectedItem();
+            item.setValue(newSystemFile);
+        }
     }
 }

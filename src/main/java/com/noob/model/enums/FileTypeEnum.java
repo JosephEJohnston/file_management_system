@@ -6,7 +6,7 @@ public enum FileTypeEnum {
     UNKNOWN(-1),
     NOT_MANAGED(0),
     FILE(1),
-    DIRECTORY(2),
+    // DIRECTORY(2), // 不再存储文件夹
     ;
     private final int type;
 
@@ -23,7 +23,7 @@ public enum FileTypeEnum {
             return FILE.type;
         }
 
-        return DIRECTORY.type;
+        return NOT_MANAGED.type;
     }
 
 
