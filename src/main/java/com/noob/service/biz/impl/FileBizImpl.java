@@ -43,7 +43,7 @@ public class FileBizImpl implements FileBiz {
 
         filePO.setName(file.getName());
         filePO.setFullPath(file.getAbsolutePath());
-        filePO.setSize(file.getTotalSpace());
+        filePO.setSize(file.length());
         filePO.setType(FileTypeEnum.getByFile(file));
 
         return filePO;

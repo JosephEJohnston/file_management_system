@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +46,6 @@ public class MainSceneController implements Initializable {
 
     @FXML
     private TextField pathTextField;
-
-    @FXML
-    private Button upButton;
 
     @FXML
     private TreeView<SystemFile> fileTreeView;
@@ -92,16 +90,7 @@ public class MainSceneController implements Initializable {
     }
 
     private void initTreeView() {
-        fileTreeView.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
-                getCurrentItem()
-                        .map(TreeItem::getValue)
-                        .map(SystemFile::getFile)
-                        .ifPresent(file -> mainIndex
-                                .getHostServices()
-                                .showDocument(file.getAbsolutePath()));
-            }
-        });
+
     }
 
     public void searchDirectory(ActionEvent event) {
@@ -152,10 +141,28 @@ public class MainSceneController implements Initializable {
         }
     }
 
-    public void selectItem() {
+    public void selectItem(MouseEvent mouseEvent) {
+        if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
+            selectItemClickTwice(mouseEvent);
+        } else {
+            selectItemClickOnce(mouseEvent);
+        }
+    }
+
+    private void selectItemClickTwice(MouseEvent mouseEvent) {
+        getCurrentItem()
+                .map(TreeItem::getValue)
+                .map(SystemFile::getFile)
+                .ifPresent(file -> mainIndex
+                        .getHostServices()
+                        .showDocument(file.getAbsolutePath()));
+    }
+
+    private void selectItemClickOnce(MouseEvent mouseEvent) {
         Optional<TreeItem<SystemFile>> item = getCurrentItem();
         curFilePane.getChildren().clear();
 
+        System.out.println(item);
         if (item.isEmpty()) {
             return;
         }
@@ -212,6 +219,10 @@ public class MainSceneController implements Initializable {
 
         optionalTag.ifPresent(tag ->
                 tagListView.getItems().add(tag));
+    }
+
+    public void curFileRelateToTag(ActionEvent event) {
+        System.out.println(getCurrentItem());
     }
 
     private Optional<TreeItem<SystemFile>> getCurrentItem() {
