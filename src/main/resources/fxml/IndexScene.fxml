@@ -11,7 +11,7 @@
 
 <AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.noob.controller.MainSceneController">
    <children>
-      <TextField fx:id="pathTextField" onAction="#searchDirectory" prefHeight="30.0" prefWidth="600.0" />
+      <TextField fx:id="pathTextField" layoutX="62.0" onAction="#searchDirectory" prefHeight="30.0" prefWidth="540.0" />
       <TreeView fx:id="fileTreeView" layoutY="30.0" onMouseClicked="#selectItem" prefHeight="350.0" prefWidth="400.0" />
       <Label fx:id="curFileNameLabel" alignment="CENTER" layoutX="400.0" layoutY="30.0" prefHeight="25.0" prefWidth="200.0" text="-">
          <font>
@@ -28,5 +28,6 @@
       <ListView fx:id="tagListView" layoutX="600.0" prefHeight="350.0" prefWidth="200.0" />
       <TextField fx:id="addTagTextField" layoutX="680.0" layoutY="351.0" onAction="#addTag" prefHeight="25.0" prefWidth="120.0" />
       <Label layoutX="603.0" layoutY="351.0" prefHeight="23.0" prefWidth="76.0" text="Add Tag: " />
+      <Button fx:id="upButton" layoutY="-1.0" mnemonicParsing="false" onAction="#upDirectory" prefHeight="30.0" prefWidth="60.0" text="Up" />
    </children>
 </AnchorPane>

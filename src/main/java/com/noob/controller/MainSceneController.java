@@ -39,6 +39,9 @@ public class MainSceneController implements Initializable {
     private TextField pathTextField;
 
     @FXML
+    private Button upButton;
+
+    @FXML
     private TreeView<SystemFile> fileTreeView;
 
     @FXML
@@ -115,41 +118,58 @@ public class MainSceneController implements Initializable {
         return rootItem;
     }
 
+    public void upDirectory(ActionEvent event) {
+        Optional<String> parentPathOpt = Optional
+                .ofNullable(pathTextField.getText())
+                .map(File::new)
+                .map(File::getParent);
+
+        if (parentPathOpt.isPresent()) {
+            pathTextField.setText(parentPathOpt.get());
+            searchDirectory(null);
+        }
+    }
+
     public void selectItem() {
-        TreeItem<SystemFile> item = fileTreeView.getSelectionModel().getSelectedItem();
+        Optional<TreeItem<SystemFile>> item = getCurrentItem();
         curFilePane.getChildren().clear();
 
-        if (item != null) {
-            SystemFile systemFile = item.getValue();
+        if (item.isEmpty()) {
+            return;
+        }
 
-            curFileNameLabel.setText(systemFile.getFile().getName());
+        SystemFile systemFile = item.get().getValue();
 
-            if (systemFile instanceof SystemNormalFile normalFile) {
-                curFileStatusLabel.setText("YES");
+        curFileNameLabel.setText(systemFile.getFile().getName());
 
-                List<Tag> tagList = normalFile.getManagedFile().getTagList();
-                List<Button> tagLabelList = tagList.stream()
-                        .map(tag -> {
-                            Button button = new Button(tag.getName());
-                            button.setMinWidth(50);
-                            button.setMinHeight(30);
+        if (systemFile instanceof SystemNormalFile normalFile) {
+            curFileStatusLabel.setText("YES");
 
-                            return button;
-                        }).toList();
+            List<Tag> tagList = normalFile.getManagedFile().getTagList();
+            List<Button> tagLabelList = tagList.stream()
+                    .map(tag -> {
+                        Button button = new Button(tag.getName());
+                        button.setMinWidth(50);
+                        button.setMinHeight(30);
 
-                curFilePane.getChildren().addAll(tagLabelList);
-            } else {
-                curFileStatusLabel.setText("NO");
-            }
+                        return button;
+                    }).toList();
+
+            curFilePane.getChildren().addAll(tagLabelList);
+        } else {
+            curFileStatusLabel.setText("NO");
         }
     }
 
     public void manageFile() {
-        SystemFile curSelectedFile = fileTreeView.getSelectionModel().getSelectedItem().getValue();
-        if (curSelectedFile == null || curSelectedFile.getFile().isDirectory()) {
+        Optional<TreeItem<SystemFile>> currentItemOpt = getCurrentItem();
+        Optional<SystemFile> systemFileOpt = currentItemOpt
+                .map(TreeItem::getValue);
+        if (systemFileOpt.isEmpty() || systemFileOpt.get().getFile().isDirectory()) {
             return;
         }
 
+        SystemFile curSelectedFile = systemFileOpt.get();
         SystemFile newSystemFile = fileBiz.addManagedFile(curSelectedFile.getFile())
                 .map(managedFile -> (SystemFile) SystemNormalFile
                         .of(curSelectedFile.getFile(), managedFile))
@@ -158,7 +178,7 @@ public class MainSceneController implements Initializable {
         if (newSystemFile instanceof SystemNormalFile) {
             curFileStatusLabel.setText("YES");
 
-            TreeItem<SystemFile> item = fileTreeView.getSelectionModel().getSelectedItem();
+            TreeItem<SystemFile> item = currentItemOpt.get();
             item.setValue(newSystemFile);
         }
     }
@@ -170,5 +190,9 @@ public class MainSceneController implements Initializable {
 
         optionalTag.ifPresent(tag ->
                 tagListView.getItems().add(tag));
+    }
+
+    private Optional<TreeItem<SystemFile>> getCurrentItem() {
+        return Optional.ofNullable(fileTreeView.getSelectionModel().getSelectedItem());
     }
 }
