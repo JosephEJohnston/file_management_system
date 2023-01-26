@@ -3,9 +3,8 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.noob.controller.TagSearchSceneController">
    <children>
-      <ListView fx:id="searchFileListView" prefHeight="400.0" prefWidth="400.0" />
+      <ListView fx:id="searchFileListView" onMouseClicked="#selectItem" prefHeight="400.0" prefWidth="400.0" />
    </children>
 </AnchorPane>

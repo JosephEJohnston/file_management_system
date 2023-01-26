@@ -7,10 +7,7 @@ import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -19,10 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
-import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -40,7 +35,7 @@ import java.util.stream.Collectors;
 public class MainSceneController implements Initializable {
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private TagSearchSceneController tagSearchSceneController;
 
     @Autowired
     private FileBiz fileBiz;
@@ -81,7 +76,6 @@ public class MainSceneController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initIconUrl();
         initTagListView();
-        initTreeView();
     }
 
     private void initIconUrl() {
@@ -97,10 +91,6 @@ public class MainSceneController implements Initializable {
         List<Tag> tagList = tagBiz.getAllTag();
 
         tagListView.getItems().addAll(tagList);
-    }
-
-    private void initTreeView() {
-
     }
 
     public void searchDirectory() {
@@ -270,20 +260,10 @@ public class MainSceneController implements Initializable {
     }
 
     public void selectTagClickTwice() throws IOException {
-        Resource resource = new ClassPathResource("fxml/TagSearchScene.fxml");
-        FXMLLoader loader = new FXMLLoader(resource.getURL());
-        loader.setControllerFactory(param -> applicationContext.getBean(param));
-
-        Parent root = loader.load();
-        TagSearchSceneController controller = loader.getController();
-
-        getCurrentSelectedTag()
-                .ifPresent(controller::addTagAndSearch);
-
-        Scene scene = new Scene(root);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
+        Optional<Tag> tagOpt = getCurrentSelectedTag();
+        if (tagOpt.isPresent()) {
+            tagSearchSceneController.loadTagSearchStage(tagOpt.get());
+        }
     }
 
     private Optional<TreeItem<SystemFile>> getCurrentSelectedFile() {
