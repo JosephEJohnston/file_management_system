@@ -11,10 +11,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @SpringBootApplication
+@Component
 public class MainIndex extends Application {
 
     private static ConfigurableApplicationContext applicationContext;

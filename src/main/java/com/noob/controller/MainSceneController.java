@@ -1,15 +1,20 @@
 package com.noob.controller;
 
+import com.noob.MainIndex;
 import com.noob.model.bo.SystemFile;
 import com.noob.model.bo.SystemNormalFile;
 import com.noob.model.bo.SystemNotManagedFile;
 import com.noob.model.bo.Tag;
+import com.noob.model.constants.Contants;
 import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.TagBiz;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -34,6 +39,9 @@ public class MainSceneController implements Initializable {
 
     @Autowired
     private TagBiz tagBiz;
+
+    @Autowired
+    private MainIndex mainIndex;
 
     @FXML
     private TextField pathTextField;
@@ -65,6 +73,7 @@ public class MainSceneController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initIconUrl();
         initTagListView();
+        initTreeView();
     }
 
     private void initIconUrl() {
@@ -80,6 +89,19 @@ public class MainSceneController implements Initializable {
         List<Tag> tagList = tagBiz.getAllTag();
 
         tagListView.getItems().addAll(tagList);
+    }
+
+    private void initTreeView() {
+        fileTreeView.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
+                getCurrentItem()
+                        .map(TreeItem::getValue)
+                        .map(SystemFile::getFile)
+                        .ifPresent(file -> mainIndex
+                                .getHostServices()
+                                .showDocument(file.getAbsolutePath()));
+            }
+        });
     }
 
     public void searchDirectory(ActionEvent event) {
