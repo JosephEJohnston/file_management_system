@@ -11,6 +11,8 @@ public interface TagService {
 
     Optional<TagPO> selectByName(String name);
 
+    List<TagPO> selectAll();
+
     List<TagPO> selectByNameList(List<String> nameList);
 
     List<TagPO> selectByIdList(List<Long> tagIdList);

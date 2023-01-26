@@ -126,7 +126,7 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
             ManagedFile managedFile = normalFile.getManagedFile();
 
             List<Tag> tagList = entityIdToTagMap
-                    .getOrDefault(managedFile.getId(), Collections.emptyList())
+                    .getOrDefault(managedFile.getId(), new ArrayList<>())
                     .stream().map(Tag::of).toList();
 
             managedFile.setTagList(tagList);

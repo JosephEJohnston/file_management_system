@@ -45,6 +45,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, TagPO> implements Tag
     }
 
     @Override
+    public List<TagPO> selectAll() {
+        return list();
+    }
+
+    @Override
     public List<TagPO> selectByNameList(List<String> nameList) {
         if (CollectionUtils.isEmpty(nameList)) {
             return Collections.emptyList();

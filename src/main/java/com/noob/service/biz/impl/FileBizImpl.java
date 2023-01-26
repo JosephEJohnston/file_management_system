@@ -31,8 +31,9 @@ public class FileBizImpl implements FileBiz {
 
         fileService.add(filePO);
 
-        return fileService
-                .selectById(filePO.getId())
+        return Optional.of(filePO)
+                .map(FilePO::getId)
+                .flatMap(fileService::selectById)
                 .map(ManagedFile::of);
     }
 

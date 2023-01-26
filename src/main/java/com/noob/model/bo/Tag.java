@@ -9,7 +9,6 @@ import org.springframework.beans.BeanUtils;
 
 @Getter
 @Setter
-@ToString
 public class Tag {
 
     private String name;
@@ -32,5 +31,10 @@ public class Tag {
         BeanUtils.copyProperties(po, tag);
 
         return tag;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

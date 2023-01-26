@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,7 +24,7 @@ public class ManagedFile {
     private List<Tag> tagList;
 
     private ManagedFile() {
-
+        this.tagList = new ArrayList<>();
     }
 
     public static ManagedFile of(FilePO po) {

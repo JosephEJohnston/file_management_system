@@ -5,6 +5,7 @@ import com.noob.model.bo.SystemNormalFile;
 import com.noob.model.bo.SystemNotManagedFile;
 import com.noob.model.bo.Tag;
 import com.noob.service.biz.FileBiz;
+import com.noob.service.biz.TagBiz;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @Controller
@@ -29,6 +31,9 @@ public class MainSceneController implements Initializable {
 
     @Autowired
     private FileBiz fileBiz;
+
+    @Autowired
+    private TagBiz tagBiz;
 
     @FXML
     private TextField pathTextField;
@@ -45,18 +50,33 @@ public class MainSceneController implements Initializable {
     @FXML
     private Label curFileStatusLabel;
 
-    private String directoryIconUrl;
+    @FXML
+    private TextField addTagTextField;
 
-    private SystemFile curSelectedFile;
+    @FXML
+    private ListView<Tag> tagListView;
+
+    private String directoryIconUrl;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        initIconUrl();
+        initTagListView();
+    }
+
+    private void initIconUrl() {
         Resource resource = new ClassPathResource("static/picture/folder_icon.png");
         try {
             directoryIconUrl = resource.getURL().toString();
         } catch (IOException ignore) {
 
         }
+    }
+
+    private void initTagListView() {
+        List<Tag> tagList = tagBiz.getAllTag();
+
+        tagListView.getItems().addAll(tagList);
     }
 
     public void searchDirectory(ActionEvent event) {
@@ -101,7 +121,6 @@ public class MainSceneController implements Initializable {
 
         if (item != null) {
             SystemFile systemFile = item.getValue();
-            curSelectedFile = systemFile;
 
             curFileNameLabel.setText(systemFile.getFile().getName());
 
@@ -126,6 +145,7 @@ public class MainSceneController implements Initializable {
     }
 
     public void manageFile() {
+        SystemFile curSelectedFile = fileTreeView.getSelectionModel().getSelectedItem().getValue();
         if (curSelectedFile == null || curSelectedFile.getFile().isDirectory()) {
             return;
         }
@@ -141,5 +161,14 @@ public class MainSceneController implements Initializable {
             TreeItem<SystemFile> item = fileTreeView.getSelectionModel().getSelectedItem();
             item.setValue(newSystemFile);
         }
+    }
+
+    public void addTag(ActionEvent event) {
+        String tagName = addTagTextField.getText();
+
+        Optional<Tag> optionalTag = tagBiz.addTag(tagName);
+
+        optionalTag.ifPresent(tag ->
+                tagListView.getItems().add(tag));
     }
 }
