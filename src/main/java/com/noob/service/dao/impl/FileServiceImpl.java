@@ -61,4 +61,14 @@ public class FileServiceImpl
 
         return list(wrapper);
     }
+
+    @Override
+    public List<FilePO> selectByIdList(List<Long> idList) {
+        QueryWrapper<FilePO> wrapper = new QueryWrapper<>();
+
+        wrapper.lambda()
+                .in(FilePO::getId, idList);
+
+        return list(wrapper);
+    }
 }

@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@ToString
 public class ManagedFile {
     private Long id;
 
@@ -33,5 +32,10 @@ public class ManagedFile {
         BeanUtils.copyProperties(po, managedFile);
 
         return managedFile;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

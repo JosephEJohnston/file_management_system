@@ -14,4 +14,6 @@ public interface FileService {
     Optional<FilePO> selectByNameAndFullPath(String name, String fullPath);
 
     List<FilePO> selectByNameList(List<String> nameList);
+
+    List<FilePO> selectByIdList(List<Long> idList);
 }

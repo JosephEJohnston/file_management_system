@@ -7,7 +7,10 @@ import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -16,8 +19,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -33,6 +38,9 @@ import java.util.stream.Collectors;
 
 @Controller
 public class MainSceneController implements Initializable {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private FileBiz fileBiz;
@@ -177,18 +185,20 @@ public class MainSceneController implements Initializable {
 
             List<Tag> tagList = normalFile.getManagedFile().getTagList();
             List<Button> tagLabelList = tagList.stream()
-                    .map(tag -> {
-                        Button button = new Button(tag.getName());
-                        button.setMinWidth(50);
-                        button.setMinHeight(30);
-
-                        return button;
-                    }).toList();
+                    .map(this::makeTagButton).toList();
 
             curFilePane.getChildren().addAll(tagLabelList);
         } else {
             curFileStatusLabel.setText("NO");
         }
+    }
+
+    private Button makeTagButton(Tag tag) {
+        Button button = new Button(tag.getName());
+        button.setMinWidth(50);
+        button.setMinHeight(30);
+
+        return button;
     }
 
     public void manageFile() {
@@ -251,6 +261,29 @@ public class MainSceneController implements Initializable {
 
         managedFile.getTagList().add(tag);
         selectItemClickOnce();
+    }
+
+    public void selectTag(MouseEvent mouseEvent) throws IOException {
+        if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
+            selectTagClickTwice();
+        }
+    }
+
+    public void selectTagClickTwice() throws IOException {
+        Resource resource = new ClassPathResource("fxml/TagSearchScene.fxml");
+        FXMLLoader loader = new FXMLLoader(resource.getURL());
+        loader.setControllerFactory(param -> applicationContext.getBean(param));
+
+        Parent root = loader.load();
+        TagSearchSceneController controller = loader.getController();
+
+        getCurrentSelectedTag()
+                .ifPresent(controller::addTagAndSearch);
+
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.show();
     }
 
     private Optional<TreeItem<SystemFile>> getCurrentSelectedFile() {
