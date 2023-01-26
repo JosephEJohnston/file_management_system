@@ -127,7 +127,8 @@ public class RenderSystemFileDirectoryBizImpl implements RenderSystemFileDirecto
 
             List<Tag> tagList = entityIdToTagMap
                     .getOrDefault(managedFile.getId(), new ArrayList<>())
-                    .stream().map(Tag::of).toList();
+                    .stream().map(Tag::of)
+                    .collect(Collectors.toList());
 
             managedFile.setTagList(tagList);
         }

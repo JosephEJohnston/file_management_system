@@ -1,14 +1,11 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.model.bo.SystemFile;
-import com.noob.model.bo.SystemNormalFile;
-import com.noob.model.bo.SystemNotManagedFile;
-import com.noob.model.bo.Tag;
+import com.noob.model.bo.*;
 import com.noob.model.constants.Contants;
 import com.noob.service.biz.FileBiz;
+import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -31,6 +28,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class MainSceneController implements Initializable {
@@ -40,6 +39,9 @@ public class MainSceneController implements Initializable {
 
     @Autowired
     private TagBiz tagBiz;
+
+    @Autowired
+    private FileTagBiz fileTagBiz;
 
     @Autowired
     private MainIndex mainIndex;
@@ -93,7 +95,7 @@ public class MainSceneController implements Initializable {
 
     }
 
-    public void searchDirectory(ActionEvent event) {
+    public void searchDirectory() {
         String directoryPath = pathTextField.getText();
 
         File directory = new File(directoryPath);
@@ -129,7 +131,7 @@ public class MainSceneController implements Initializable {
         return rootItem;
     }
 
-    public void upDirectory(ActionEvent event) {
+    public void upDirectory() {
         Optional<String> parentPathOpt = Optional
                 .ofNullable(pathTextField.getText())
                 .map(File::new)
@@ -137,20 +139,20 @@ public class MainSceneController implements Initializable {
 
         if (parentPathOpt.isPresent()) {
             pathTextField.setText(parentPathOpt.get());
-            searchDirectory(null);
+            searchDirectory();
         }
     }
 
     public void selectItem(MouseEvent mouseEvent) {
         if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
-            selectItemClickTwice(mouseEvent);
+            selectItemClickTwice();
         } else {
-            selectItemClickOnce(mouseEvent);
+            selectItemClickOnce();
         }
     }
 
-    private void selectItemClickTwice(MouseEvent mouseEvent) {
-        getCurrentItem()
+    private void selectItemClickTwice() {
+        getCurrentSelectedFile()
                 .map(TreeItem::getValue)
                 .map(SystemFile::getFile)
                 .ifPresent(file -> mainIndex
@@ -158,11 +160,10 @@ public class MainSceneController implements Initializable {
                         .showDocument(file.getAbsolutePath()));
     }
 
-    private void selectItemClickOnce(MouseEvent mouseEvent) {
-        Optional<TreeItem<SystemFile>> item = getCurrentItem();
+    private void selectItemClickOnce() {
+        Optional<TreeItem<SystemFile>> item = getCurrentSelectedFile();
         curFilePane.getChildren().clear();
 
-        System.out.println(item);
         if (item.isEmpty()) {
             return;
         }
@@ -191,7 +192,7 @@ public class MainSceneController implements Initializable {
     }
 
     public void manageFile() {
-        Optional<TreeItem<SystemFile>> currentItemOpt = getCurrentItem();
+        Optional<TreeItem<SystemFile>> currentItemOpt = getCurrentSelectedFile();
         Optional<SystemFile> systemFileOpt = currentItemOpt
                 .map(TreeItem::getValue);
         if (systemFileOpt.isEmpty() || systemFileOpt.get().getFile().isDirectory()) {
@@ -212,7 +213,7 @@ public class MainSceneController implements Initializable {
         }
     }
 
-    public void addTag(ActionEvent event) {
+    public void addTag() {
         String tagName = addTagTextField.getText();
 
         Optional<Tag> optionalTag = tagBiz.addTag(tagName);
@@ -221,11 +222,42 @@ public class MainSceneController implements Initializable {
                 tagListView.getItems().add(tag));
     }
 
-    public void curFileRelateToTag(ActionEvent event) {
-        System.out.println(getCurrentItem());
+    public void curFileRelateToTag() {
+        Optional<SystemFile> optFile = getCurrentSelectedFile()
+                .map(TreeItem::getValue)
+                .filter(f -> f instanceof SystemNormalFile);
+
+        Optional<Tag> optTag = getCurrentSelectedTag();
+
+        if (optFile.isEmpty() || optTag.isEmpty()) {
+            return;
+        }
+
+        SystemNormalFile systemNormalFile = (SystemNormalFile) optFile.get();
+        Tag tag = optTag.get();
+
+        ManagedFile managedFile = systemNormalFile.getManagedFile();
+        Set<String> fileTagNameSet = managedFile.getTagList()
+                .stream().map(Tag::getName).collect(Collectors.toSet());
+
+        if (fileTagNameSet.contains(tag.getName())) {
+            return;
+        }
+
+        boolean result = fileTagBiz.relateFileToTag(managedFile, tag);
+        if (!result) {
+            return;
+        }
+
+        managedFile.getTagList().add(tag);
+        selectItemClickOnce();
     }
 
-    private Optional<TreeItem<SystemFile>> getCurrentItem() {
+    private Optional<TreeItem<SystemFile>> getCurrentSelectedFile() {
         return Optional.ofNullable(fileTreeView.getSelectionModel().getSelectedItem());
+    }
+
+    private Optional<Tag> getCurrentSelectedTag() {
+        return Optional.ofNullable(tagListView.getSelectionModel().getSelectedItem());
     }
 }
