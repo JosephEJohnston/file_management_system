@@ -2,7 +2,7 @@ package com.noob.controller;
 
 import com.noob.MainIndex;
 import com.noob.model.bo.*;
-import com.noob.model.constants.Contants;
+import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
@@ -142,7 +142,7 @@ public class MainSceneController implements Initializable {
     }
 
     public void selectItem(MouseEvent mouseEvent) {
-        if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
+        if(mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT) {
             selectItemClickTwice();
         } else {
             selectItemClickOnce();
@@ -254,7 +254,7 @@ public class MainSceneController implements Initializable {
     }
 
     public void selectTag(MouseEvent mouseEvent) throws IOException {
-        if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
+        if(mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT) {
             selectTagClickTwice();
         }
     }

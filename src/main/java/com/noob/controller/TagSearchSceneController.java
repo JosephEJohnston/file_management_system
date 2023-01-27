@@ -3,7 +3,7 @@ package com.noob.controller;
 import com.noob.MainIndex;
 import com.noob.model.bo.ManagedFile;
 import com.noob.model.bo.Tag;
-import com.noob.model.constants.Contants;
+import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.SceneLoadBiz;
 import jakarta.annotation.Resource;
@@ -12,7 +12,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Controller;
@@ -40,6 +44,8 @@ public class TagSearchSceneController implements Initializable {
     private ListView<ManagedFile> searchFileListView;
 
     private List<Tag> searchTagList;
+
+    private ContextMenu itemContextMenu;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -70,11 +76,20 @@ public class TagSearchSceneController implements Initializable {
     }
 
     public void selectItem(MouseEvent mouseEvent) {
-        if(mouseEvent.getClickCount() == Contants.MOUSE_DOUBLE_CLICK_COUNT) {
-            selectItemClickTwice();
-        } else {
-            selectItemClickOnce();
+
+        if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+            selectItemSecondaryMenu(mouseEvent);
+        } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+            if(mouseEvent.getClickCount() == Constants.MOUSE_ONE_CLICK_COUNT) {
+                selectItemClickOnce();
+            } else if (mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT){
+                selectItemClickTwice();
+            }
         }
+    }
+
+    private void selectItemClickOnce() {
+        itemContextMenu.hide();
     }
 
     private void selectItemClickTwice() {
@@ -84,8 +99,11 @@ public class TagSearchSceneController implements Initializable {
                         .getHostServices().showDocument(path));
     }
 
-    private void selectItemClickOnce() {
+    private void selectItemSecondaryMenu(MouseEvent e) {
+        MenuItem rename = new MenuItem("rename");
+        itemContextMenu = new ContextMenu(rename);
 
+        itemContextMenu.show(searchFileListView, e.getScreenX(), e.getScreenY());
     }
 
     private Optional<ManagedFile> getCurrentSelectedFile() {
