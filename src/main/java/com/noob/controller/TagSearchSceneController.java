@@ -11,13 +11,11 @@ import jakarta.annotation.Resource;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -54,6 +52,8 @@ public class TagSearchSceneController implements Initializable {
 
     private ContextMenu itemContextMenu;
 
+    private FileBoardComponent fileBoard;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         searchTagList = new ArrayList<>();
@@ -65,8 +65,9 @@ public class TagSearchSceneController implements Initializable {
 
         AnchorPane root = loader.load();
 
-        FileBoardComponent component = applicationContext.getBean(FileBoardComponent.class);
-        root.getChildren().add(component.makeFileBoard());
+        fileBoard = applicationContext
+                .getBean(FileBoardComponent.class);
+        root.getChildren().add(fileBoard.getRoot());
 
         addTagAndSearch(initTag);
 
@@ -83,6 +84,9 @@ public class TagSearchSceneController implements Initializable {
                 .searchFileByTagList(searchTagList);
 
         searchFileListView.getItems().addAll(managedFileList);
+        searchFileListView.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> fileBoard.showFile(newValue));
+        searchFileListView.getSelectionModel().selectFirst();
     }
 
     public void selectPane(MouseEvent mouseEvent) {
@@ -100,7 +104,6 @@ public class TagSearchSceneController implements Initializable {
     }
 
     public void selectItem(MouseEvent mouseEvent) {
-
         if (mouseEvent.getButton() == MouseButton.SECONDARY) {
             selectItemSecondaryMenu(mouseEvent);
         } else if (mouseEvent.getButton() == MouseButton.PRIMARY) {
@@ -109,8 +112,6 @@ public class TagSearchSceneController implements Initializable {
             }
         }
     }
-
-
 
     private void selectItemClickTwice() {
         getCurrentSelectedFile()

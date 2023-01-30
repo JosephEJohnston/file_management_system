@@ -59,7 +59,7 @@ public class MainSceneController implements Initializable {
     private Label curFileNameLabel;
 
     @FXML
-    private FlowPane curFilePane;
+    private FlowPane curFileTagListPane;
 
     @FXML
     private Label curFileStatusLabel;
@@ -165,7 +165,7 @@ public class MainSceneController implements Initializable {
 
     private void selectItemClickOnce() {
         Optional<TreeItem<SystemFile>> item = getCurrentSelectedFile();
-        curFilePane.getChildren().clear();
+        curFileTagListPane.getChildren().clear();
 
         if (item.isEmpty()) {
             return;
@@ -182,7 +182,7 @@ public class MainSceneController implements Initializable {
             List<Button> tagLabelList = tagList.stream()
                     .map(this::makeTagButton).toList();
 
-            curFilePane.getChildren().addAll(tagLabelList);
+            curFileTagListPane.getChildren().addAll(tagLabelList);
         } else {
             curFileStatusLabel.setText("NO");
         }

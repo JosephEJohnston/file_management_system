@@ -3,7 +3,6 @@ package com.noob.model.bo;
 import com.noob.model.po.FilePO;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
