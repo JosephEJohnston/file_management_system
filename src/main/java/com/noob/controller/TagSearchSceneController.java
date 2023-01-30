@@ -1,7 +1,8 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.FileBoardComponent;
+import com.noob.component.FileBoardPane;
+import com.noob.component.RenameFileScene;
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.ManagedFile;
 import com.noob.model.bo.Tag;
@@ -16,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -53,7 +53,7 @@ public class TagSearchSceneController implements Initializable {
 
     private ContextMenu itemContextMenu;
 
-    private FileBoardComponent fileBoard;
+    private FileBoardPane fileBoard;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -66,7 +66,7 @@ public class TagSearchSceneController implements Initializable {
 
         AnchorPane root = loader.load();
 
-        fileBoard = applicationContext.getBean(FileBoardComponent.class,
+        fileBoard = applicationContext.getBean(FileBoardPane.class,
                 new NormalConfig(200, 0));
         root.getChildren().add(fileBoard.getRoot());
 
@@ -127,6 +127,15 @@ public class TagSearchSceneController implements Initializable {
         if (itemContextMenu != null && itemContextMenu.isShowing()) {
             return;
         }
+
+        newMenu.setOnAction(event ->
+                getCurrentSelectedFile()
+                .ifPresent(f -> {
+                    RenameFileScene renameFileScene = applicationContext
+                            .getBean(RenameFileScene.class, f);
+
+                    renameFileScene.show();
+                }));
 
         itemContextMenu = newMenu;
         itemContextMenu.show(searchFileListView, e.getScreenX(), e.getScreenY());

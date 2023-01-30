@@ -13,11 +13,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class FileBoardComponent {
+public class FileBoardPane {
 
     private final NormalConfig config;
 
@@ -31,7 +30,7 @@ public class FileBoardComponent {
 
     private ManagedFile curFile;
 
-    public FileBoardComponent(NormalConfig config) {
+    public FileBoardPane(NormalConfig config) {
         this.config = config;
         initFileBoard();
     }

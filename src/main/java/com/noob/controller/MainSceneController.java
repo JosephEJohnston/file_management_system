@@ -1,7 +1,7 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.FileBoardComponent;
+import com.noob.component.FileBoardPane;
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
 import com.noob.model.constants.Constants;
@@ -12,15 +12,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 
 import java.io.File;
@@ -68,27 +64,15 @@ public class MainSceneController implements Initializable {
     @FXML
     private ListView<Tag> tagListView;
 
-    private FileBoardComponent fileBoard;
-
-    private String directoryIconUrl;
+    private FileBoardPane fileBoard;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        initIconUrl();
         initTagListView();
-        fileBoard = applicationContext.getBean(FileBoardComponent.class,
+        fileBoard = applicationContext.getBean(FileBoardPane.class,
                 new NormalConfig(400, 30));
 
         rootPane.getChildren().add(fileBoard.getRoot());
-    }
-
-    private void initIconUrl() {
-        Resource resource = new ClassPathResource("static/picture/folder_icon.png");
-        try {
-            directoryIconUrl = resource.getURL().toString();
-        } catch (IOException ignore) {
-
-        }
     }
 
     private void initTagListView() {
@@ -134,10 +118,7 @@ public class MainSceneController implements Initializable {
         Pair<SystemNotManagedFile, List<SystemFile>> pair = fileBiz
                 .renderSystemFileDirectory(directory);
 
-        TreeItem<SystemFile> rootItem = new TreeItem<>(
-                pair.getLeft(),
-                new ImageView(new Image(directoryIconUrl))
-        );
+        TreeItem<SystemFile> rootItem = new TreeItem<>(pair.getLeft());
 
         pair.getRight().forEach(file -> rootItem
                 .getChildren().add(new TreeItem<>(file)));
@@ -204,9 +185,10 @@ public class MainSceneController implements Initializable {
     }
 
     public void curFileRelateToTag() {
-        Optional<SystemFile> optFile = getCurrentSelectedFile()
+        Optional<SystemNormalFile> optFile = getCurrentSelectedFile()
                 .map(TreeItem::getValue)
-                .filter(f -> f instanceof SystemNormalFile);
+                .filter(f -> f instanceof SystemNormalFile)
+                .map(f -> (SystemNormalFile) f);
 
         Optional<Tag> optTag = getCurrentSelectedTag();
 
@@ -214,13 +196,11 @@ public class MainSceneController implements Initializable {
             return;
         }
 
-        SystemNormalFile systemNormalFile = (SystemNormalFile) optFile.get();
-        Tag tag = optTag.get();
-
-        ManagedFile managedFile = systemNormalFile.getManagedFile();
+        ManagedFile managedFile = optFile.get().getManagedFile();
         Set<String> fileTagNameSet = managedFile.getTagList()
                 .stream().map(Tag::getName).collect(Collectors.toSet());
 
+        Tag tag = optTag.get();
         if (fileTagNameSet.contains(tag.getName())) {
             return;
         }
