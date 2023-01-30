@@ -2,6 +2,7 @@ package com.noob.controller;
 
 import com.noob.MainIndex;
 import com.noob.component.FileBoardComponent;
+import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.ManagedFile;
 import com.noob.model.bo.Tag;
 import com.noob.model.constants.Constants;
@@ -65,8 +66,8 @@ public class TagSearchSceneController implements Initializable {
 
         AnchorPane root = loader.load();
 
-        fileBoard = applicationContext
-                .getBean(FileBoardComponent.class);
+        fileBoard = applicationContext.getBean(FileBoardComponent.class,
+                new NormalConfig(200, 0));
         root.getChildren().add(fileBoard.getRoot());
 
         addTagAndSearch(initTag);

@@ -1,6 +1,8 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
+import com.noob.component.FileBoardComponent;
+import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
 import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileBiz;
@@ -9,15 +11,14 @@ import com.noob.service.biz.TagBiz;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.AnchorPane;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,9 @@ import java.util.stream.Collectors;
 public class MainSceneController implements Initializable {
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private TagSearchSceneController tagSearchSceneController;
 
     @Autowired
@@ -50,19 +54,13 @@ public class MainSceneController implements Initializable {
     private MainIndex mainIndex;
 
     @FXML
+    private AnchorPane rootPane;
+
+    @FXML
     private TextField pathTextField;
 
     @FXML
     private TreeView<SystemFile> fileTreeView;
-
-    @FXML
-    private Label curFileNameLabel;
-
-    @FXML
-    private FlowPane curFileTagListPane;
-
-    @FXML
-    private Label curFileStatusLabel;
 
     @FXML
     private TextField addTagTextField;
@@ -70,12 +68,18 @@ public class MainSceneController implements Initializable {
     @FXML
     private ListView<Tag> tagListView;
 
+    private FileBoardComponent fileBoard;
+
     private String directoryIconUrl;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initIconUrl();
         initTagListView();
+        fileBoard = applicationContext.getBean(FileBoardComponent.class,
+                new NormalConfig(400, 30));
+
+        rootPane.getChildren().add(fileBoard.getRoot());
     }
 
     private void initIconUrl() {
@@ -112,6 +116,13 @@ public class MainSceneController implements Initializable {
         }
 
         fileTreeView.setRoot(makeRootTree(directory));
+        fileTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            SystemFile file = Optional.ofNullable(newValue)
+                    .map(TreeItem::getValue)
+                    .orElse(null);
+
+            fileBoard.showFile(file);
+        });
     }
 
     private TreeItem<SystemFile> makeRootTree(File directory) {
@@ -144,9 +155,10 @@ public class MainSceneController implements Initializable {
     public void selectItem(MouseEvent mouseEvent) {
         if(mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT) {
             selectItemClickTwice();
-        } else {
-            selectItemClickOnce();
         }
+        /*else {
+            selectItemClickOnce();
+        }*/
     }
 
     private void selectItemClickTwice() {
@@ -161,39 +173,6 @@ public class MainSceneController implements Initializable {
                         searchDirectory(file.getAbsolutePath());
                     }
                 });
-    }
-
-    private void selectItemClickOnce() {
-        Optional<TreeItem<SystemFile>> item = getCurrentSelectedFile();
-        curFileTagListPane.getChildren().clear();
-
-        if (item.isEmpty()) {
-            return;
-        }
-
-        SystemFile systemFile = item.get().getValue();
-
-        curFileNameLabel.setText(systemFile.getFile().getName());
-
-        if (systemFile instanceof SystemNormalFile normalFile) {
-            curFileStatusLabel.setText("YES");
-
-            List<Tag> tagList = normalFile.getManagedFile().getTagList();
-            List<Button> tagLabelList = tagList.stream()
-                    .map(this::makeTagButton).toList();
-
-            curFileTagListPane.getChildren().addAll(tagLabelList);
-        } else {
-            curFileStatusLabel.setText("NO");
-        }
-    }
-
-    private Button makeTagButton(Tag tag) {
-        Button button = new Button(tag.getName());
-        button.setMinWidth(50);
-        button.setMinHeight(30);
-
-        return button;
     }
 
     public void manageFile() {
@@ -211,7 +190,8 @@ public class MainSceneController implements Initializable {
                 .orElse(SystemNotManagedFile.of(curSelectedFile.getFile()));
 
         if (newSystemFile instanceof SystemNormalFile) {
-            curFileStatusLabel.setText("YES");
+            // todo
+            // curFileStatusLabel.setText("YES");
 
             TreeItem<SystemFile> item = currentItemOpt.get();
             item.setValue(newSystemFile);
@@ -255,7 +235,8 @@ public class MainSceneController implements Initializable {
         }
 
         managedFile.getTagList().add(tag);
-        selectItemClickOnce();
+        // todo
+        // selectItemClickOnce();
     }
 
     public void selectTag(MouseEvent mouseEvent) throws IOException {

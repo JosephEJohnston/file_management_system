@@ -1,6 +1,9 @@
 package com.noob.component;
 
+import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.ManagedFile;
+import com.noob.model.bo.SystemFile;
+import com.noob.model.bo.SystemNormalFile;
 import com.noob.model.bo.Tag;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,10 +16,13 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FileBoardComponent {
+
+    private final NormalConfig config;
 
     private AnchorPane root;
 
@@ -28,7 +34,8 @@ public class FileBoardComponent {
 
     private ManagedFile curFile;
 
-    public FileBoardComponent() {
+    public FileBoardComponent(NormalConfig config) {
+        this.config = config;
         initFileBoard();
     }
 
@@ -36,8 +43,8 @@ public class FileBoardComponent {
         root = new AnchorPane();
         root.setPrefWidth(200);
         root.setPrefHeight(200);
-        root.setLayoutX(200);
-        root.setLayoutY(0);
+        root.setLayoutX(config.rootLayoutX());
+        root.setLayoutY(config.rootLayoutY());
 
         initCurFileNameLabel();
         initTagFlowPane();
@@ -75,6 +82,16 @@ public class FileBoardComponent {
         curFileStatusLabel.setAlignment(Pos.CENTER);
     }
 
+    public void showFile(SystemFile file) {
+        ManagedFile managedFile = Optional.ofNullable(file)
+                .filter(f -> f instanceof SystemNormalFile)
+                .map(f -> (SystemNormalFile) f)
+                .map(SystemNormalFile::getManagedFile)
+                .orElse(null);
+
+        showFile(managedFile);
+    }
+
     public void showFile(ManagedFile file) {
         curFile = file;
 
@@ -96,16 +113,16 @@ public class FileBoardComponent {
         tagFlowPane.getChildren().addAll(tagList);
     }
 
-    private void removeTagList() {
-        tagFlowPane.getChildren().clear();
-    }
-
     private Button makeTagButton(Tag tag) {
         Button button = new Button(tag.getName());
         button.setMinWidth(50);
         button.setMinHeight(30);
 
         return button;
+    }
+
+    private void removeTagList() {
+        tagFlowPane.getChildren().clear();
     }
 
     public AnchorPane getRoot() {
