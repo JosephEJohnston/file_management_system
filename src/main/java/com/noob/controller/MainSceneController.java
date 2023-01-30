@@ -156,9 +156,6 @@ public class MainSceneController implements Initializable {
         if(mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT) {
             selectItemClickTwice();
         }
-        /*else {
-            selectItemClickOnce();
-        }*/
     }
 
     private void selectItemClickTwice() {
@@ -190,8 +187,7 @@ public class MainSceneController implements Initializable {
                 .orElse(SystemNotManagedFile.of(curSelectedFile.getFile()));
 
         if (newSystemFile instanceof SystemNormalFile) {
-            // todo
-            // curFileStatusLabel.setText("YES");
+            fileBoard.showFile(newSystemFile);
 
             TreeItem<SystemFile> item = currentItemOpt.get();
             item.setValue(newSystemFile);
@@ -235,8 +231,7 @@ public class MainSceneController implements Initializable {
         }
 
         managedFile.getTagList().add(tag);
-        // todo
-        // selectItemClickOnce();
+        fileBoard.showFile(managedFile);
     }
 
     public void selectTag(MouseEvent mouseEvent) throws IOException {

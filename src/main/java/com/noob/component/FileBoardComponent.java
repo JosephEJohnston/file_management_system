@@ -1,10 +1,7 @@
 package com.noob.component;
 
 import com.noob.component.config.NormalConfig;
-import com.noob.model.bo.ManagedFile;
-import com.noob.model.bo.SystemFile;
-import com.noob.model.bo.SystemNormalFile;
-import com.noob.model.bo.Tag;
+import com.noob.model.bo.*;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -83,13 +80,19 @@ public class FileBoardComponent {
     }
 
     public void showFile(SystemFile file) {
-        ManagedFile managedFile = Optional.ofNullable(file)
-                .filter(f -> f instanceof SystemNormalFile)
-                .map(f -> (SystemNormalFile) f)
-                .map(SystemNormalFile::getManagedFile)
-                .orElse(null);
+        if (file == null) {
+            getCurFileNameLabel().setText("-");
+            getCurFileStatusLabel().setText("-");
 
-        showFile(managedFile);
+            return;
+        }
+
+        if (file instanceof SystemNotManagedFile f) {
+            getCurFileNameLabel().setText(f.getFile().getName());
+            getCurFileStatusLabel().setText("NO");
+        } else if (file instanceof SystemNormalFile f) {
+            showFile(f.getManagedFile());
+        }
     }
 
     public void showFile(ManagedFile file) {
