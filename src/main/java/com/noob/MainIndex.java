@@ -1,5 +1,6 @@
 package com.noob;
 
+import com.noob.utils.H2Utils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +31,13 @@ public class MainIndex extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        createTableIfNotExist();
+
         startStage(primaryStage);
+    }
+
+    private void createTableIfNotExist() {
+        H2Utils.createTableIfNotExist();
     }
 
     private void startStage(Stage primaryStage) throws IOException {
