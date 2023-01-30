@@ -93,6 +93,11 @@ public class MainSceneController implements Initializable {
         tagListView.getItems().addAll(tagList);
     }
 
+    public void searchDirectory(String path) {
+        pathTextField.setText(path);
+        searchDirectory();
+    }
+
     public void searchDirectory() {
         String directoryPath = pathTextField.getText();
 
@@ -130,15 +135,10 @@ public class MainSceneController implements Initializable {
     }
 
     public void upDirectory() {
-        Optional<String> parentPathOpt = Optional
-                .ofNullable(pathTextField.getText())
+        Optional.ofNullable(pathTextField.getText())
                 .map(File::new)
-                .map(File::getParent);
-
-        if (parentPathOpt.isPresent()) {
-            pathTextField.setText(parentPathOpt.get());
-            searchDirectory();
-        }
+                .map(File::getParent)
+                .ifPresent(this::searchDirectory);
     }
 
     public void selectItem(MouseEvent mouseEvent) {
@@ -153,9 +153,14 @@ public class MainSceneController implements Initializable {
         getCurrentSelectedFile()
                 .map(TreeItem::getValue)
                 .map(SystemFile::getFile)
-                .ifPresent(file -> mainIndex
-                        .getHostServices()
-                        .showDocument(file.getAbsolutePath()));
+                .ifPresent(file -> {
+                    if (file.isFile()) {
+                        mainIndex.getHostServices()
+                                .showDocument(file.getAbsolutePath());
+                    } else {
+                        searchDirectory(file.getAbsolutePath());
+                    }
+                });
     }
 
     private void selectItemClickOnce() {
