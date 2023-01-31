@@ -4,9 +4,9 @@ import com.noob.MainIndex;
 import com.noob.component.FileBoardPane;
 import com.noob.component.RenameFileScene;
 import com.noob.component.config.NormalConfig;
+import com.noob.component.config.RenameConfig;
 import com.noob.model.bo.ManagedFile;
 import com.noob.model.bo.SystemNormalFile;
-import com.noob.model.bo.SystemNotManagedFile;
 import com.noob.model.bo.Tag;
 import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileTagBiz;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 @Controller
 public class TagSearchSceneController implements Initializable {
@@ -81,8 +82,16 @@ public class TagSearchSceneController implements Initializable {
     }
 
     public void addTagAndSearch(Tag tag) {
-        searchTagList.add(tag);
+        addTag(tag);
 
+        searchFileByTag();
+    }
+
+    private void addTag(Tag tag) {
+        searchTagList.add(tag);
+    }
+
+    private void searchFileByTag() {
         List<ManagedFile> managedFileList = fileTagBiz
                 .searchFileByTagList(searchTagList);
 
@@ -134,8 +143,13 @@ public class TagSearchSceneController implements Initializable {
         newMenu.setOnAction(event ->
                 getCurrentSelectedFile()
                 .ifPresent(f -> {
+                    Consumer<ManagedFile> callback = (file) -> {
+                        searchFileListView.refresh();
+                        fileBoard.showFile(SystemNormalFile.of(file));
+                    };
+
                     RenameFileScene renameFileScene = applicationContext
-                            .getBean(RenameFileScene.class, f);
+                            .getBean(RenameFileScene.class, new RenameConfig(f, callback));
 
                     renameFileScene.show();
                 }));

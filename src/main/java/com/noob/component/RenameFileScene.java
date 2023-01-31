@@ -1,15 +1,14 @@
 package com.noob.component;
 
+import com.noob.component.config.RenameConfig;
 import com.noob.model.bo.ManagedFile;
+import com.noob.model.bo.SystemFile;
 import com.noob.service.biz.FileBiz;
 import jakarta.annotation.Resource;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -36,10 +35,12 @@ public class RenameFileScene {
 
     private Button confirmButton;
 
-    private final ManagedFile curFile;
+    private final RenameConfig renameConfig;
 
-    public RenameFileScene(ManagedFile curFile) {
-        this.curFile = curFile;
+    public RenameFileScene(
+            RenameConfig renameConfig
+    ) {
+        this.renameConfig = renameConfig;
         initStage();
     }
 
@@ -76,7 +77,7 @@ public class RenameFileScene {
 
     private void initOriginalFileNameTextField() {
         originalFileName = new TextField();
-        originalFileName.setText(curFile.getName());
+        originalFileName.setText(renameConfig.curFile().getName());
         originalFileName.setFont(Font.font(15));
         originalFileName.setDisable(true);
         originalFileName.setLayoutX(180);
@@ -107,6 +108,8 @@ public class RenameFileScene {
         cancelButton.setPrefHeight(24);
         cancelButton.setLayoutX(70);
         cancelButton.setLayoutY(150);
+
+        cancelButton.setOnAction(event -> stage.close());
     }
 
     private void initConfirmButton() {
@@ -117,7 +120,12 @@ public class RenameFileScene {
         confirmButton.setLayoutX(270);
         confirmButton.setLayoutY(150);
 
-        confirmButton.setOnAction(event -> renameFile());
+        confirmButton.setOnAction(event -> {
+            renameFile();
+            renameConfig.callbackWhenExit()
+                    .accept(renameConfig.curFile());
+            stage.close();
+        });
     }
 
     public void show() {
@@ -125,7 +133,7 @@ public class RenameFileScene {
     }
 
     public void renameFile() {
-        File file = new File(curFile.getFullPath());
+        File file = new File(renameConfig.curFile().getFullPath());
 
         if (!file.exists()) {
             return;
@@ -138,8 +146,8 @@ public class RenameFileScene {
             return;
         }
 
-        curFile.setName(newFileName.getText());
-        curFile.setFullPath(newPath);
-        fileBiz.updateFile(curFile);
+        renameConfig.curFile().setName(newFileName.getText());
+        renameConfig.curFile().setFullPath(newPath);
+        fileBiz.updateFile(renameConfig.curFile());
     }
 }

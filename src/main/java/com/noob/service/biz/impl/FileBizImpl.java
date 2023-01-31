@@ -9,6 +9,7 @@ import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.RenderSystemFileDirectoryBiz;
 import com.noob.service.dao.FileService;
 import jakarta.annotation.Resource;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
@@ -58,8 +59,18 @@ public class FileBizImpl implements FileBiz {
         FilePO po = new FilePO();
 
         BeanUtils.copyProperties(file, po);
+        po.setName(getName(file));
+        po.setFullPath(getFullPath(file));
 
         return po;
+    }
+
+    private String getName(ManagedFile file) {
+        return StringUtils.isNotEmpty(file.getName()) ? file.getName() : null;
+    }
+
+    private String getFullPath(ManagedFile file) {
+        return StringUtils.isNotEmpty(file.getFullPath()) ? file.getFullPath() : null;
     }
 
     @Override
