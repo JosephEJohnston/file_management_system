@@ -5,4 +5,5 @@
 4. 可对 tag 本身进行搜索
 5. 问题，fxml 怎么拆组件？（done，参见 FileBoardComponent）
 6. 随机视频播放
+7. Manage this file 失效问题
 
