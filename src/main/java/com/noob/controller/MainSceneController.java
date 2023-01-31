@@ -8,7 +8,6 @@ import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileBiz;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -224,7 +224,8 @@ public class MainSceneController implements Initializable {
     public void selectTagClickTwice() throws IOException {
         Optional<Tag> tagOpt = getCurrentSelectedTag();
         if (tagOpt.isPresent()) {
-            tagSearchSceneController.loadTagSearchStage(tagOpt.get());
+            Consumer<Void> refreshCallback = (v) -> searchDirectory();
+            tagSearchSceneController.loadTagSearchStage(tagOpt.get(), refreshCallback);
         }
     }
 

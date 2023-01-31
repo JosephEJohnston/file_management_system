@@ -63,7 +63,10 @@ public class TagSearchSceneController implements Initializable {
         searchTagList = new ArrayList<>();
     }
 
-    public void loadTagSearchStage(Tag initTag) throws IOException {
+    public void loadTagSearchStage(
+            Tag initTag,
+            Consumer<Void> refreshCallback
+    ) throws IOException {
         FXMLLoader loader = sceneLoadBiz
                 .makeFXMLLoader("fxml/TagSearchScene.fxml");
 
@@ -79,6 +82,8 @@ public class TagSearchSceneController implements Initializable {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
+        stage.setOnCloseRequest(event ->
+                refreshCallback.accept(null));
     }
 
     public void addTagAndSearch(Tag tag) {
