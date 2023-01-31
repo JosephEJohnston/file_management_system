@@ -211,7 +211,7 @@ public class MainSceneController implements Initializable {
         }
 
         managedFile.getTagList().add(tag);
-        fileBoard.showFile(managedFile);
+        fileBoard.showFile(SystemNormalFile.of(managedFile));
     }
 
     public void selectTag(MouseEvent mouseEvent) throws IOException {

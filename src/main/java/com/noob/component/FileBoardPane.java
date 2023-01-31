@@ -79,6 +79,8 @@ public class FileBoardPane {
     }
 
     public void showFile(SystemFile file) {
+        removeTagList();
+
         if (file == null) {
             getCurFileNameLabel().setText("-");
             getCurFileStatusLabel().setText("-");
@@ -86,25 +88,13 @@ public class FileBoardPane {
             return;
         }
 
-        if (file instanceof SystemNotManagedFile f) {
-            getCurFileNameLabel().setText(f.getFile().getName());
+        getCurFileNameLabel().setText(file.getFile().getName());
+        if (file instanceof SystemNotManagedFile) {
             getCurFileStatusLabel().setText("NO");
         } else if (file instanceof SystemNormalFile f) {
-            showFile(f.getManagedFile());
-        }
-    }
-
-    public void showFile(ManagedFile file) {
-        curFile = file;
-
-        removeTagList();
-        if (curFile != null) {
-            getCurFileNameLabel().setText(curFile.getName());
+            this.curFile = f.getManagedFile();
             getCurFileStatusLabel().setText("YES");
             showTagList();
-        } else {
-            getCurFileNameLabel().setText("-");
-            getCurFileStatusLabel().setText("-");
         }
     }
 

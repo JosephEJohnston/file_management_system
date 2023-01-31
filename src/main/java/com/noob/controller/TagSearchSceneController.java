@@ -5,6 +5,8 @@ import com.noob.component.FileBoardPane;
 import com.noob.component.RenameFileScene;
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.ManagedFile;
+import com.noob.model.bo.SystemNormalFile;
+import com.noob.model.bo.SystemNotManagedFile;
 import com.noob.model.bo.Tag;
 import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileTagBiz;
@@ -86,7 +88,8 @@ public class TagSearchSceneController implements Initializable {
 
         searchFileListView.getItems().addAll(managedFileList);
         searchFileListView.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> fileBoard.showFile(newValue));
+                .addListener((observable, oldValue, newValue) -> fileBoard
+                        .showFile(SystemNormalFile.of(newValue)));
         searchFileListView.getSelectionModel().selectFirst();
     }
 

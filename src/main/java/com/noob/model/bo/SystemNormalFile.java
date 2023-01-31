@@ -24,6 +24,18 @@ public class SystemNormalFile extends SystemFile {
         return normalFile;
     }
 
+    public static SystemNormalFile of(
+            ManagedFile managedFile
+    ) {
+
+        SystemNormalFile normalFile = new SystemNormalFile();
+
+        normalFile.setFile(new File(managedFile.getFullPath()));
+        normalFile.setManagedFile(managedFile);
+
+        return normalFile;
+    }
+
     public ManagedFile getManagedFile() {
         return managedFile;
     }
