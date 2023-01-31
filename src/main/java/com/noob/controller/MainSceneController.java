@@ -22,10 +22,7 @@ import org.springframework.stereotype.Controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -57,7 +54,7 @@ public class MainSceneController implements Initializable {
     private TextField pathTextField;
 
     @FXML
-    private TreeView<SystemFile> fileTreeView;
+    private ListView<SystemFile> fileListView;
 
     @FXML
     private TextField addTagTextField;
@@ -100,31 +97,21 @@ public class MainSceneController implements Initializable {
             return;
         }
 
-        fileTreeView.setRoot(makeRootTree(directory));
-        fileTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            SystemFile file = Optional.ofNullable(newValue)
-                    .map(TreeItem::getValue)
-                    .orElse(null);
-
-            fileBoard.showFile(file);
-        });
+        fileListView.getItems().setAll(makeSystemFileList(directory));
+        fileListView.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> fileBoard.showFile(newValue));
     }
 
-    private TreeItem<SystemFile> makeRootTree(File directory) {
+    private List<SystemFile> makeSystemFileList(File directory) {
         File[] files = directory.listFiles();
         if (files == null) {
-            return new TreeItem<>();
+            return new ArrayList<>();
         }
 
         Pair<SystemNotManagedFile, List<SystemFile>> pair = fileBiz
                 .renderSystemFileDirectory(directory);
 
-        TreeItem<SystemFile> rootItem = new TreeItem<>(pair.getLeft());
-
-        pair.getRight().forEach(file -> rootItem
-                .getChildren().add(new TreeItem<>(file)));
-
-        return rootItem;
+        return pair.getRight();
     }
 
     public void upDirectory() {
@@ -142,7 +129,6 @@ public class MainSceneController implements Initializable {
 
     private void selectItemClickTwice() {
         getCurrentSelectedFile()
-                .map(TreeItem::getValue)
                 .map(SystemFile::getFile)
                 .ifPresent(file -> {
                     if (file.isFile()) {
@@ -155,9 +141,7 @@ public class MainSceneController implements Initializable {
     }
 
     public void manageFile() {
-        Optional<TreeItem<SystemFile>> currentItemOpt = getCurrentSelectedFile();
-        Optional<SystemFile> systemFileOpt = currentItemOpt
-                .map(TreeItem::getValue);
+        Optional<SystemFile> systemFileOpt = getCurrentSelectedFile();
         if (systemFileOpt.isEmpty() || systemFileOpt.get().getFile().isDirectory()) {
             return;
         }
@@ -171,8 +155,8 @@ public class MainSceneController implements Initializable {
         if (newSystemFile instanceof SystemNormalFile) {
             fileBoard.showFile(newSystemFile);
 
-            TreeItem<SystemFile> item = currentItemOpt.get();
-            item.setValue(newSystemFile);
+            int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
+            fileListView.getItems().set(selectedIndex, newSystemFile);
         }
     }
 
@@ -187,7 +171,6 @@ public class MainSceneController implements Initializable {
 
     public void curFileRelateToTag() {
         Optional<SystemNormalFile> optFile = getCurrentSelectedFile()
-                .map(TreeItem::getValue)
                 .filter(f -> f instanceof SystemNormalFile)
                 .map(f -> (SystemNormalFile) f);
 
@@ -229,8 +212,8 @@ public class MainSceneController implements Initializable {
         }
     }
 
-    private Optional<TreeItem<SystemFile>> getCurrentSelectedFile() {
-        return Optional.ofNullable(fileTreeView.getSelectionModel().getSelectedItem());
+    private Optional<SystemFile> getCurrentSelectedFile() {
+        return Optional.ofNullable(fileListView.getSelectionModel().getSelectedItem());
     }
 
     private Optional<Tag> getCurrentSelectedTag() {
