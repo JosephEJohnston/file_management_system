@@ -12,5 +12,7 @@ import java.util.Optional;
 public interface FileBiz {
     Optional<ManagedFile> addManagedFile(File file);
 
+    boolean updateFile(ManagedFile file);
+
     Pair<SystemNotManagedFile, List<SystemFile>> renderSystemFileDirectory(File directory);
 }

@@ -1,10 +1,15 @@
 package com.noob.component;
 
 import com.noob.model.bo.ManagedFile;
+import com.noob.service.biz.FileBiz;
+import jakarta.annotation.Resource;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -12,9 +17,14 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RenameFileScene {
+
+    @Resource
+    private FileBiz fileBiz;
 
     private Stage stage;
 
@@ -106,9 +116,30 @@ public class RenameFileScene {
         confirmButton.setPrefHeight(24);
         confirmButton.setLayoutX(270);
         confirmButton.setLayoutY(150);
+
+        confirmButton.setOnAction(event -> renameFile());
     }
 
     public void show() {
         stage.show();
+    }
+
+    public void renameFile() {
+        File file = new File(curFile.getFullPath());
+
+        if (!file.exists()) {
+            return;
+        }
+
+        String newPath = file.getParent() + "\\" + newFileName.getText();
+        boolean result = file.renameTo(new File(newPath));
+
+        if (!result) {
+            return;
+        }
+
+        curFile.setName(newFileName.getText());
+        curFile.setFullPath(newPath);
+        fileBiz.updateFile(curFile);
     }
 }

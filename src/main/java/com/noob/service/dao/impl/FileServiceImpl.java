@@ -28,6 +28,11 @@ public class FileServiceImpl
     }
 
     @Override
+    public boolean update(FilePO po) {
+        return this.updateById(po);
+    }
+
+    @Override
     public Optional<FilePO> selectById(long id) {
         return Optional.of(getById(id));
     }

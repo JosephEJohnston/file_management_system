@@ -9,6 +9,8 @@ public interface FileService {
 
     void add(FilePO po);
 
+    boolean update(FilePO po);
+
     Optional<FilePO> selectById(long id);
 
     Optional<FilePO> selectByNameAndFullPath(String name, String fullPath);

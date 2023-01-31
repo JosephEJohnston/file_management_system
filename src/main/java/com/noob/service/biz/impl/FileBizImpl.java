@@ -10,6 +10,7 @@ import com.noob.service.biz.RenderSystemFileDirectoryBiz;
 import com.noob.service.dao.FileService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,6 @@ public class FileBizImpl implements FileBiz {
                 .map(ManagedFile::of);
     }
 
-
     private FilePO toPO(File file) {
         FilePO filePO = new FilePO();
 
@@ -47,6 +47,19 @@ public class FileBizImpl implements FileBiz {
         filePO.setType(FileTypeEnum.getByFile(file));
 
         return filePO;
+    }
+
+    @Override
+    public boolean updateFile(ManagedFile file) {
+        return fileService.update(toPO(file));
+    }
+
+    private FilePO toPO(ManagedFile file) {
+        FilePO po = new FilePO();
+
+        BeanUtils.copyProperties(file, po);
+
+        return po;
     }
 
     @Override
