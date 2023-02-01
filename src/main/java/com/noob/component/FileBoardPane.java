@@ -28,7 +28,7 @@ public class FileBoardPane {
 
     private Label curFileStatusLabel;
 
-    private ManagedFile curFile;
+    private SystemFile curFile;
 
     public FileBoardPane(NormalConfig config) {
         this.config = config;
@@ -88,18 +88,23 @@ public class FileBoardPane {
             return;
         }
 
+        this.curFile = file;
         getCurFileNameLabel().setText(file.getFile().getName());
         if (file instanceof SystemNotManagedFile) {
             getCurFileStatusLabel().setText("NO");
-        } else if (file instanceof SystemNormalFile f) {
-            this.curFile = f.getManagedFile();
+        } else if (file instanceof SystemNormalFile) {
             getCurFileStatusLabel().setText("YES");
             showTagList();
         }
     }
 
     private void showTagList() {
-        List<Button> tagList = curFile.getTagList().stream()
+        if (!(this.curFile instanceof SystemNormalFile)) {
+            return;
+        }
+
+        List<Button> tagList = ((SystemNormalFile)curFile)
+                .getManagedFile().getTagList().stream()
                 .map(this::makeTagButton).toList();
 
         tagFlowPane.getChildren().addAll(tagList);

@@ -22,16 +22,16 @@ open module file.management.system {
     requires org.apache.commons.lang3;
     requires org.apache.commons.collections4;
 
+    // 仅仅是为了消除 idea 报错
+    exports com.noob.component.config to spring.beans;
+    exports com.noob.model.bo to spring.beans;
+    exports com.noob.model.po to spring.beans;
+    exports com.noob.service.biz to spring.beans;
+
+    // 实际需要 exports 的包
     exports com.noob to javafx.graphics, spring.beans, spring.context;
     exports com.noob.controller to spring.beans;
     exports com.noob.component to spring.beans;
     exports com.noob.service.biz.impl to spring.beans;
     exports com.noob.service.dao.impl to spring.beans;
-
-    /*opens com.noob to spring.core;
-    opens com.noob.controller to spring.core;
-    opens com.noob.component to spring.core;
-    opens com.noob.service.biz.impl to spring.core;
-    opens com.noob.service.dao.impl to spring.core;
-    opens com.noob.model.po to com.baomidou.mybatis.plus.core;*/
 }
