@@ -3,6 +3,7 @@ package com.noob.component.pane;
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
 import com.noob.service.biz.FileBiz;
+import com.noob.service.biz.TagBiz;
 import jakarta.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class FileBoardPane {
+public class FileListPane {
 
     @Resource
     private FileBiz fileBiz;
@@ -43,7 +44,7 @@ public class FileBoardPane {
 
     private Consumer<SystemFile> callbackWhenManageFileSuccess;
 
-    public FileBoardPane(NormalConfig config) {
+    public FileListPane(NormalConfig config) {
         this.config = config;
         this.curFile = new SimpleObjectProperty<>(null);
         initFileBoard();
@@ -160,7 +161,10 @@ public class FileBoardPane {
                 .map(managedFile -> SystemNormalFile.of(file, managedFile))
                 .ifPresent(f -> {
                     showFile(f);
-                    callbackWhenManageFileSuccess.accept(f);
+
+                    if (callbackWhenManageFileSuccess != null) {
+                        callbackWhenManageFileSuccess.accept(f);
+                    }
                 });
     }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -9,16 +8,7 @@
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.noob.controller.MainSceneController">
    <children>
       <TextField fx:id="pathTextField" layoutX="62.0" onAction="#searchDirectory" prefHeight="30.0" prefWidth="540.0" />
-      <!--<Label fx:id="curFileStatusLabel" alignment="CENTER" layoutX="400.0" layoutY="282.0" prefHeight="20.0" prefWidth="85.0" text="-">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>-->
-      <ListView fx:id="tagListView" layoutX="600.0" layoutY="30.0" onMouseClicked="#selectTag" prefHeight="320.0" prefWidth="200.0" />
-      <TextField fx:id="addTagTextField" layoutX="680.0" layoutY="351.0" onAction="#addTag" prefHeight="25.0" prefWidth="120.0" />
-      <Label layoutX="603.0" layoutY="351.0" prefHeight="23.0" prefWidth="76.0" text="Add Tag: " />
       <Button fx:id="upButton" layoutY="-1.0" mnemonicParsing="false" onAction="#upDirectory" prefHeight="30.0" prefWidth="60.0" text="Up" />
-      <Button fx:id="relateToTagButton" layoutX="600.0" layoutY="376.0" mnemonicParsing="false" onAction="#curFileRelateToTag" prefHeight="23.0" prefWidth="113.0" text="Relate To Tag" />
       <ListView fx:id="fileListView" layoutY="30.0" onMouseClicked="#selectItem" prefHeight="370.0" prefWidth="400.0" />
    </children>
 </AnchorPane>

@@ -22,7 +22,7 @@ open module file.management.system {
     requires org.apache.commons.lang3;
     requires org.apache.commons.collections4;
 
-    // 仅仅是为了消除 idea 报错
+    // 仅仅是为了消除 idea 告警
     exports com.noob.component.config to spring.beans;
     exports com.noob.model.bo to spring.beans;
     exports com.noob.model.po to spring.beans;

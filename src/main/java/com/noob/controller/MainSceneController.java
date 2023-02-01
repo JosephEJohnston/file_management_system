@@ -1,13 +1,13 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.pane.FileBoardPane;
+import com.noob.component.pane.FileListPane;
 import com.noob.component.config.NormalConfig;
+import com.noob.component.pane.TagListPane;
 import com.noob.model.bo.*;
 import com.noob.model.constants.Constants;
 import com.noob.service.biz.FileBiz;
-import com.noob.service.biz.FileTagBiz;
-import com.noob.service.biz.TagBiz;
+import jakarta.annotation.Resource;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -15,36 +15,23 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Controller
 public class MainSceneController implements Initializable {
 
-    @Autowired
+    @Resource
     private ApplicationContext applicationContext;
 
-    @Autowired
-    private TagSearchSceneController tagSearchSceneController;
-
-    @Autowired
+    @Resource
     private FileBiz fileBiz;
 
-    @Autowired
-    private TagBiz tagBiz;
-
-    @Autowired
-    private FileTagBiz fileTagBiz;
-
-    @Autowired
+    @Resource
     private MainIndex mainIndex;
 
     @FXML
@@ -56,31 +43,38 @@ public class MainSceneController implements Initializable {
     @FXML
     private ListView<SystemFile> fileListView;
 
-    @FXML
-    private TextField addTagTextField;
+    private FileListPane fileListPane;
 
-    @FXML
-    private ListView<Tag> tagListView;
-
-    private FileBoardPane fileBoard;
+    private TagListPane tagListPane;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        initTagListView();
-        fileBoard = applicationContext.getBean(FileBoardPane.class,
+        initFileListPane();
+        initTagListPane();
+
+        rootPane.getChildren().addAll(fileListPane.getRoot(), tagListPane.getRoot());
+    }
+
+    private void initFileListPane() {
+        fileListPane = applicationContext.getBean(FileListPane.class,
                 new NormalConfig(400, 30));
-        fileBoard.setCallbackWhenManageFileSuccess((f) -> {
+        fileListPane.setCallbackWhenManageFileSuccess((f) -> {
             int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
             fileListView.getItems().set(selectedIndex, f);
         });
-
-        rootPane.getChildren().add(fileBoard.getRoot());
     }
 
-    private void initTagListView() {
-        List<Tag> tagList = tagBiz.getAllTag();
+    private void initTagListPane() {
+        tagListPane = applicationContext.getBean(TagListPane.class,
+                new NormalConfig(600, 0));
 
-        tagListView.getItems().addAll(tagList);
+        tagListPane.searchTagList();
+        tagListPane.setCallbackWhenCloseTagSearchScene(
+                () -> fileListView.refresh());
+        tagListPane.setCallbackWhenRelateGetFile(
+                () -> getCurrentSelectedFile().orElse(null));
+        tagListPane.setCallbackWhenRelateFinish(
+                (f) -> fileListPane.showFile(SystemNormalFile.of(f)));
     }
 
     public void searchDirectory(String path) {
@@ -103,7 +97,7 @@ public class MainSceneController implements Initializable {
 
         fileListView.getItems().setAll(makeSystemFileList(directory));
         fileListView.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> fileBoard.showFile(newValue));
+                (observable, oldValue, newValue) -> fileListPane.showFile(newValue));
     }
 
     private List<SystemFile> makeSystemFileList(File directory) {
@@ -144,63 +138,7 @@ public class MainSceneController implements Initializable {
                 });
     }
 
-    public void addTag() {
-        String tagName = addTagTextField.getText();
-
-        Optional<Tag> optionalTag = tagBiz.addTag(tagName);
-
-        optionalTag.ifPresent(tag ->
-                tagListView.getItems().add(tag));
-    }
-
-    public void curFileRelateToTag() {
-        Optional<SystemNormalFile> optFile = getCurrentSelectedFile()
-                .filter(f -> f instanceof SystemNormalFile)
-                .map(f -> (SystemNormalFile) f);
-
-        Optional<Tag> optTag = getCurrentSelectedTag();
-
-        if (optFile.isEmpty() || optTag.isEmpty()) {
-            return;
-        }
-
-        ManagedFile managedFile = optFile.get().getManagedFile();
-        Set<String> fileTagNameSet = managedFile.getTagList()
-                .stream().map(Tag::getName).collect(Collectors.toSet());
-
-        Tag tag = optTag.get();
-        if (fileTagNameSet.contains(tag.getName())) {
-            return;
-        }
-
-        boolean result = fileTagBiz.relateFileToTag(managedFile, tag);
-        if (!result) {
-            return;
-        }
-
-        managedFile.getTagList().add(tag);
-        fileBoard.showFile(SystemNormalFile.of(managedFile));
-    }
-
-    public void selectTag(MouseEvent mouseEvent) throws IOException {
-        if(mouseEvent.getClickCount() == Constants.MOUSE_DOUBLE_CLICK_COUNT) {
-            selectTagClickTwice();
-        }
-    }
-
-    public void selectTagClickTwice() throws IOException {
-        Optional<Tag> tagOpt = getCurrentSelectedTag();
-        if (tagOpt.isPresent()) {
-            Consumer<Void> refreshCallback = (v) -> searchDirectory();
-            tagSearchSceneController.loadTagSearchStage(tagOpt.get(), refreshCallback);
-        }
-    }
-
     private Optional<SystemFile> getCurrentSelectedFile() {
         return Optional.ofNullable(fileListView.getSelectionModel().getSelectedItem());
-    }
-
-    private Optional<Tag> getCurrentSelectedTag() {
-        return Optional.ofNullable(tagListView.getSelectionModel().getSelectedItem());
     }
 }

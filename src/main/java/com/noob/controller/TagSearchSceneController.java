@@ -1,7 +1,7 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.pane.FileBoardPane;
+import com.noob.component.pane.FileListPane;
 import com.noob.component.scene.RenameFileScene;
 import com.noob.component.config.NormalConfig;
 import com.noob.component.config.RenameConfig;
@@ -26,7 +26,6 @@ import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class TagSearchSceneController implements Initializable {
 
     private ContextMenu itemContextMenu;
 
-    private FileBoardPane fileBoard;
+    private FileListPane fileBoard;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -65,25 +64,32 @@ public class TagSearchSceneController implements Initializable {
 
     public void loadTagSearchStage(
             Tag initTag,
-            Consumer<Void> refreshCallback
-    ) throws IOException {
-        FXMLLoader loader = sceneLoadBiz
-                .makeFXMLLoader("fxml/TagSearchScene.fxml");
+            Runnable callbackWhenClose
+    ) {
+        try {
+            FXMLLoader loader = sceneLoadBiz
+                    .makeFXMLLoader("fxml/TagSearchScene.fxml");
 
-        AnchorPane root = loader.load();
+            AnchorPane root = loader.load();
 
-        fileBoard = applicationContext.getBean(FileBoardPane.class,
-                new NormalConfig(200, 0));
-        root.getChildren().add(fileBoard.getRoot());
+            fileBoard = applicationContext.getBean(FileListPane.class,
+                    new NormalConfig(200, 0));
+            root.getChildren().add(fileBoard.getRoot());
 
-        addTagAndSearch(initTag);
+            addTagAndSearch(initTag);
 
-        Scene scene = new Scene(root);
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.show();
-        stage.setOnCloseRequest(event ->
-                refreshCallback.accept(null));
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.show();
+            stage.setOnCloseRequest(event -> {
+                if (callbackWhenClose != null) {
+                    callbackWhenClose.run();
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void addTagAndSearch(Tag tag) {

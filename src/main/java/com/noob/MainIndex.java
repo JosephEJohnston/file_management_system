@@ -51,6 +51,9 @@ public class MainIndex extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        primaryStage.setOnShowing(event -> {
+            
+        });
         primaryStage.setOnCloseRequest(event -> {
             Platform.exit();
             System.exit(0);
