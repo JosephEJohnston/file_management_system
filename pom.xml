@@ -74,16 +74,6 @@
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>
     </dependency>
-    <!--<dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-media</artifactId>
-      <version>${javafx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-web</artifactId>
-      <version>${javafx.version}</version>
-    </dependency>-->
   </dependencies>
 
   <build>
@@ -97,23 +87,6 @@
           </executable>
         </configuration>
       </plugin>
-      <!--<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-        </configuration>
-      </plugin>-->
-      <!--<plugin>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-maven-plugin</artifactId>
-        <version>${javafx.maven.plugin.version}</version>
-        <configuration>
-          <mainClass>com.noob.MainIndex</mainClass>
-        </configuration>
-      </plugin>-->
     </plugins>
   </build>
 

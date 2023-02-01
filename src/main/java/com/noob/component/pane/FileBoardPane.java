@@ -49,7 +49,7 @@ public class FileBoardPane {
         initFileBoard();
     }
 
-    public void initFileBoard() {
+    private void initFileBoard() {
         root = new AnchorPane();
         root.setPrefWidth(200);
         root.setPrefHeight(200);
