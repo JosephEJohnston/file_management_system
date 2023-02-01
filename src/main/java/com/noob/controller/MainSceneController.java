@@ -69,6 +69,10 @@ public class MainSceneController implements Initializable {
         initTagListView();
         fileBoard = applicationContext.getBean(FileBoardPane.class,
                 new NormalConfig(400, 30));
+        fileBoard.setCallbackWhenManageFileSuccess((f) -> {
+            int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
+            fileListView.getItems().set(selectedIndex, f);
+        });
 
         rootPane.getChildren().add(fileBoard.getRoot());
     }
@@ -138,26 +142,6 @@ public class MainSceneController implements Initializable {
                         searchDirectory(file.getAbsolutePath());
                     }
                 });
-    }
-
-    public void manageFile() {
-        Optional<SystemFile> systemFileOpt = getCurrentSelectedFile();
-        if (systemFileOpt.isEmpty() || systemFileOpt.get().getFile().isDirectory()) {
-            return;
-        }
-
-        SystemFile curSelectedFile = systemFileOpt.get();
-        SystemFile newSystemFile = fileBiz.addManagedFile(curSelectedFile.getFile())
-                .map(managedFile -> (SystemFile) SystemNormalFile
-                        .of(curSelectedFile.getFile(), managedFile))
-                .orElse(SystemNotManagedFile.of(curSelectedFile.getFile()));
-
-        if (newSystemFile instanceof SystemNormalFile) {
-            fileBoard.showFile(newSystemFile);
-
-            int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
-            fileListView.getItems().set(selectedIndex, newSystemFile);
-        }
     }
 
     public void addTag() {

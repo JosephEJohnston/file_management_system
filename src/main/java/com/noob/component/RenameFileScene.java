@@ -1,6 +1,7 @@
 package com.noob.component;
 
 import com.noob.component.config.RenameConfig;
+import com.noob.model.bo.ManagedFile;
 import com.noob.service.biz.FileBiz;
 import jakarta.annotation.Resource;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -34,6 +36,8 @@ public class RenameFileScene {
     private Button confirmButton;
 
     private final RenameConfig renameConfig;
+
+    private Consumer<ManagedFile> callbackWhenExit;
 
     public RenameFileScene(
             RenameConfig renameConfig
@@ -120,7 +124,7 @@ public class RenameFileScene {
 
         confirmButton.setOnAction(event -> {
             renameFile();
-            renameConfig.callbackWhenExit()
+            callbackWhenExit
                     .accept(renameConfig.curFile());
             stage.close();
         });
@@ -147,5 +151,9 @@ public class RenameFileScene {
         renameConfig.curFile().setName(newFileName.getText());
         renameConfig.curFile().setFullPath(newPath);
         fileBiz.updateFile(renameConfig.curFile());
+    }
+
+    public void setCallbackWhenExit(Consumer<ManagedFile> callbackWhenExit) {
+        this.callbackWhenExit = callbackWhenExit;
     }
 }

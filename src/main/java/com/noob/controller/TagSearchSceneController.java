@@ -154,7 +154,8 @@ public class TagSearchSceneController implements Initializable {
                     };
 
                     RenameFileScene renameFileScene = applicationContext
-                            .getBean(RenameFileScene.class, new RenameConfig(f, callback));
+                            .getBean(RenameFileScene.class, new RenameConfig(f));
+                    renameFileScene.setCallbackWhenExit(callback);
 
                     renameFileScene.show();
                 }));

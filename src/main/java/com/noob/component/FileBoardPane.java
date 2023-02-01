@@ -2,6 +2,10 @@ package com.noob.component;
 
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
+import com.noob.service.biz.FileBiz;
+import jakarta.annotation.Resource;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,13 +16,16 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class FileBoardPane {
 
-    private final NormalConfig config;
+    @Resource
+    private FileBiz fileBiz;
 
     private AnchorPane root;
 
@@ -28,10 +35,17 @@ public class FileBoardPane {
 
     private Label curFileStatusLabel;
 
-    private SystemFile curFile;
+    private Button manageFileButton;
+
+    private final NormalConfig config;
+
+    private final ObjectProperty<SystemFile> curFile;
+
+    private Consumer<SystemFile> callbackWhenManageFileSuccess;
 
     public FileBoardPane(NormalConfig config) {
         this.config = config;
+        this.curFile = new SimpleObjectProperty<>(null);
         initFileBoard();
     }
 
@@ -45,9 +59,10 @@ public class FileBoardPane {
         initCurFileNameLabel();
         initTagFlowPane();
         initCurFileStatusLabel();
+        initManageFileButton();
 
-        root.getChildren().addAll(
-                curFileNameLabel, tagFlowPane, curFileStatusLabel);
+        root.getChildren().addAll(curFileNameLabel, tagFlowPane,
+                curFileStatusLabel, manageFileButton);
     }
 
     private void initCurFileNameLabel() {
@@ -78,6 +93,15 @@ public class FileBoardPane {
         curFileStatusLabel.setAlignment(Pos.CENTER);
     }
 
+    private void initManageFileButton() {
+        manageFileButton = new Button();
+        manageFileButton.setText("Manage This File");
+        manageFileButton.setPrefWidth(115);
+        manageFileButton.setPrefHeight(25);
+        manageFileButton.setLayoutY(270);
+        manageFileButton.setOnAction(event -> manageFile());
+    }
+
     public void showFile(SystemFile file) {
         removeTagList();
 
@@ -88,7 +112,7 @@ public class FileBoardPane {
             return;
         }
 
-        this.curFile = file;
+        this.curFile.set(file);
         getCurFileNameLabel().setText(file.getFile().getName());
         if (file instanceof SystemNotManagedFile) {
             getCurFileStatusLabel().setText("NO");
@@ -99,11 +123,11 @@ public class FileBoardPane {
     }
 
     private void showTagList() {
-        if (!(this.curFile instanceof SystemNormalFile)) {
+        if (!(this.curFile.get() instanceof SystemNormalFile)) {
             return;
         }
 
-        List<Button> tagList = ((SystemNormalFile)curFile)
+        List<Button> tagList = ((SystemNormalFile)curFile.get())
                 .getManagedFile().getTagList().stream()
                 .map(this::makeTagButton).toList();
 
@@ -120,6 +144,28 @@ public class FileBoardPane {
 
     private void removeTagList() {
         tagFlowPane.getChildren().clear();
+    }
+
+    public void manageFile() {
+        SystemFile systemFile = curFile.get();
+        if (systemFile == null || systemFile.getFile().isDirectory()) {
+            return;
+        }
+
+        File file = systemFile.getFile();
+        SystemFile newSystemFile = fileBiz.addManagedFile(file)
+                .map(managedFile -> (SystemFile) SystemNormalFile
+                        .of(file, managedFile))
+                .orElse(SystemNotManagedFile.of(file));
+
+        if (newSystemFile instanceof SystemNormalFile) {
+            showFile(newSystemFile);
+            callbackWhenManageFileSuccess.accept(newSystemFile);
+        }
+    }
+
+    public void setCallbackWhenManageFileSuccess(Consumer<SystemFile> callbackWhenManageFileSuccess) {
+        this.callbackWhenManageFileSuccess = callbackWhenManageFileSuccess;
     }
 
     public AnchorPane getRoot() {
