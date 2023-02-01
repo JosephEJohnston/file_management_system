@@ -2,8 +2,8 @@ package com.noob.component.pane;
 
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
+import com.noob.model.event.CommunicationEvent;
 import com.noob.service.biz.FileBiz;
-import com.noob.service.biz.TagBiz;
 import jakarta.annotation.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -41,8 +40,6 @@ public class FileListPane {
     private final NormalConfig config;
 
     private final ObjectProperty<SystemFile> curFile;
-
-    private Consumer<SystemFile> callbackWhenManageFileSuccess;
 
     public FileListPane(NormalConfig config) {
         this.config = config;
@@ -162,14 +159,8 @@ public class FileListPane {
                 .ifPresent(f -> {
                     showFile(f);
 
-                    if (callbackWhenManageFileSuccess != null) {
-                        callbackWhenManageFileSuccess.accept(f);
-                    }
+                    root.fireEvent(new CommunicationEvent(CommunicationEvent.MANAGE_SUCCESS, f));
                 });
-    }
-
-    public void setCallbackWhenManageFileSuccess(Consumer<SystemFile> callbackWhenManageFileSuccess) {
-        this.callbackWhenManageFileSuccess = callbackWhenManageFileSuccess;
     }
 
     public AnchorPane getRoot() {

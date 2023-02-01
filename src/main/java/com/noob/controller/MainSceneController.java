@@ -6,6 +6,7 @@ import com.noob.component.config.NormalConfig;
 import com.noob.component.pane.TagListPane;
 import com.noob.model.bo.*;
 import com.noob.model.constants.Constants;
+import com.noob.model.event.CommunicationEvent;
 import com.noob.service.biz.FileBiz;
 import jakarta.annotation.Resource;
 import javafx.fxml.FXML;
@@ -53,15 +54,15 @@ public class MainSceneController implements Initializable {
         initTagListPane();
 
         rootPane.getChildren().addAll(fileListPane.getRoot(), tagListPane.getRoot());
+        rootPane.addEventHandler(CommunicationEvent.MANAGE_SUCCESS, event -> {
+            int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
+            fileListView.getItems().set(selectedIndex, event.getFile());
+        });
     }
 
     private void initFileListPane() {
         fileListPane = applicationContext.getBean(FileListPane.class,
                 new NormalConfig(400, 30));
-        fileListPane.setCallbackWhenManageFileSuccess((f) -> {
-            int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
-            fileListView.getItems().set(selectedIndex, f);
-        });
     }
 
     private void initTagListPane() {
