@@ -21,7 +21,7 @@
             <Font size="15.0" />
          </font>
       </Label>-->
-      <ListView fx:id="tagListView" layoutX="600.0" onMouseClicked="#selectTag" prefHeight="350.0" prefWidth="200.0" />
+      <ListView fx:id="tagListView" layoutX="600.0" layoutY="30.0" onMouseClicked="#selectTag" prefHeight="320.0" prefWidth="200.0" />
       <TextField fx:id="addTagTextField" layoutX="680.0" layoutY="351.0" onAction="#addTag" prefHeight="25.0" prefWidth="120.0" />
       <Label layoutX="603.0" layoutY="351.0" prefHeight="23.0" prefWidth="76.0" text="Add Tag: " />
       <Button fx:id="upButton" layoutY="-1.0" mnemonicParsing="false" onAction="#upDirectory" prefHeight="30.0" prefWidth="60.0" text="Up" />

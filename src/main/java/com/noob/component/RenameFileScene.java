@@ -1,8 +1,6 @@
 package com.noob.component;
 
 import com.noob.component.config.RenameConfig;
-import com.noob.model.bo.ManagedFile;
-import com.noob.model.bo.SystemFile;
 import com.noob.service.biz.FileBiz;
 import jakarta.annotation.Resource;
 import javafx.scene.Scene;
