@@ -1,4 +1,4 @@
-package com.noob.component;
+package com.noob.component.scene;
 
 import com.noob.component.config.RenameConfig;
 import com.noob.model.bo.ManagedFile;

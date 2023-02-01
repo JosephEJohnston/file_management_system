@@ -31,7 +31,8 @@ open module file.management.system {
     // 实际需要 exports 的包
     exports com.noob to javafx.graphics, spring.beans, spring.context;
     exports com.noob.controller to spring.beans;
-    exports com.noob.component to spring.beans;
     exports com.noob.service.biz.impl to spring.beans;
     exports com.noob.service.dao.impl to spring.beans;
+    exports com.noob.component.scene to spring.beans;
+    exports com.noob.component.pane to spring.beans;
 }

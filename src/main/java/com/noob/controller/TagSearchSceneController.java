@@ -1,8 +1,8 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.FileBoardPane;
-import com.noob.component.RenameFileScene;
+import com.noob.component.pane.FileBoardPane;
+import com.noob.component.scene.RenameFileScene;
 import com.noob.component.config.NormalConfig;
 import com.noob.component.config.RenameConfig;
 import com.noob.model.bo.ManagedFile;

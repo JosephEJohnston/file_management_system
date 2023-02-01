@@ -1,7 +1,7 @@
 package com.noob.controller;
 
 import com.noob.MainIndex;
-import com.noob.component.FileBoardPane;
+import com.noob.component.pane.FileBoardPane;
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
 import com.noob.model.constants.Constants;

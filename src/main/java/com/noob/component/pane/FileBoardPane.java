@@ -1,4 +1,4 @@
-package com.noob.component;
+package com.noob.component.pane;
 
 import com.noob.component.config.NormalConfig;
 import com.noob.model.bo.*;
@@ -98,7 +98,8 @@ public class FileBoardPane {
         manageFileButton.setText("Manage This File");
         manageFileButton.setPrefWidth(115);
         manageFileButton.setPrefHeight(25);
-        manageFileButton.setLayoutY(270);
+        manageFileButton.setLayoutX(85);
+        manageFileButton.setLayoutY(250);
         manageFileButton.setOnAction(event -> manageFile());
     }
 
@@ -106,19 +107,21 @@ public class FileBoardPane {
         removeTagList();
 
         if (file == null) {
-            getCurFileNameLabel().setText("-");
-            getCurFileStatusLabel().setText("-");
+            curFileNameLabel.setText("-");
+            curFileStatusLabel.setText("-");
 
             return;
         }
 
         this.curFile.set(file);
-        getCurFileNameLabel().setText(file.getFile().getName());
+        curFileNameLabel.setText(file.getFile().getName());
         if (file instanceof SystemNotManagedFile) {
-            getCurFileStatusLabel().setText("NO");
+            curFileStatusLabel.setText("NO");
+            manageFileButton.setDisable(false);
         } else if (file instanceof SystemNormalFile) {
-            getCurFileStatusLabel().setText("YES");
+            curFileStatusLabel.setText("YES");
             showTagList();
+            manageFileButton.setDisable(true);
         }
     }
 
@@ -153,15 +156,12 @@ public class FileBoardPane {
         }
 
         File file = systemFile.getFile();
-        SystemFile newSystemFile = fileBiz.addManagedFile(file)
-                .map(managedFile -> (SystemFile) SystemNormalFile
-                        .of(file, managedFile))
-                .orElse(SystemNotManagedFile.of(file));
-
-        if (newSystemFile instanceof SystemNormalFile) {
-            showFile(newSystemFile);
-            callbackWhenManageFileSuccess.accept(newSystemFile);
-        }
+        fileBiz.addManagedFile(file)
+                .map(managedFile -> SystemNormalFile.of(file, managedFile))
+                .ifPresent(f -> {
+                    showFile(f);
+                    callbackWhenManageFileSuccess.accept(f);
+                });
     }
 
     public void setCallbackWhenManageFileSuccess(Consumer<SystemFile> callbackWhenManageFileSuccess) {
@@ -170,13 +170,5 @@ public class FileBoardPane {
 
     public AnchorPane getRoot() {
         return root;
-    }
-
-    public Label getCurFileNameLabel() {
-        return curFileNameLabel;
-    }
-
-    public Label getCurFileStatusLabel() {
-        return curFileStatusLabel;
     }
 }
