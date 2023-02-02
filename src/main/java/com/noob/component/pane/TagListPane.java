@@ -7,6 +7,7 @@ import com.noob.model.bo.SystemFile;
 import com.noob.model.bo.SystemNormalFile;
 import com.noob.model.bo.Tag;
 import com.noob.model.constants.Constants;
+import com.noob.model.event.CommunicationEvent;
 import com.noob.service.biz.FileTagBiz;
 import com.noob.service.biz.TagBiz;
 import jakarta.annotation.Resource;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -54,8 +54,6 @@ public class TagListPane {
     private Runnable callbackWhenCloseTagSearchScene;
 
     private Supplier<SystemFile> callbackWhenRelate;
-
-    private Consumer<ManagedFile> callbackWhenRelateFinish;
 
     public TagListPane(NormalConfig config) {
         this.config = config;
@@ -156,9 +154,8 @@ public class TagListPane {
         }
 
         managedFile.getTagList().add(tag);
-        if (callbackWhenRelateFinish != null) {
-            callbackWhenRelateFinish.accept(managedFile);
-        }
+        root.fireEvent(new CommunicationEvent(
+                CommunicationEvent.RELATE_FINISH, SystemNormalFile.of(managedFile)));
     }
 
     private void selectTag(MouseEvent mouseEvent) {
@@ -182,10 +179,6 @@ public class TagListPane {
 
     public void setCallbackWhenRelateGetFile(Supplier<SystemFile> callbackWhenRelate) {
         this.callbackWhenRelate = callbackWhenRelate;
-    }
-
-    public void setCallbackWhenRelateFinish(Consumer<ManagedFile> callbackWhenRelateFinish) {
-        this.callbackWhenRelateFinish = callbackWhenRelateFinish;
     }
 
     public AnchorPane getRoot() {

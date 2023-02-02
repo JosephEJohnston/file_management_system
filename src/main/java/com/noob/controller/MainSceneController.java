@@ -58,6 +58,9 @@ public class MainSceneController implements Initializable {
             int selectedIndex = fileListView.getSelectionModel().getSelectedIndex();
             fileListView.getItems().set(selectedIndex, event.getFile());
         });
+
+        rootPane.addEventHandler(CommunicationEvent.RELATE_FINISH,
+                event -> fileListPane.showFile(event.getFile()));
     }
 
     private void initFileListPane() {
@@ -71,11 +74,9 @@ public class MainSceneController implements Initializable {
 
         tagListPane.searchTagList();
         tagListPane.setCallbackWhenCloseTagSearchScene(
-                () -> fileListView.refresh());
+                this::searchDirectory);
         tagListPane.setCallbackWhenRelateGetFile(
                 () -> getCurrentSelectedFile().orElse(null));
-        tagListPane.setCallbackWhenRelateFinish(
-                (f) -> fileListPane.showFile(SystemNormalFile.of(f)));
     }
 
     public void searchDirectory(String path) {

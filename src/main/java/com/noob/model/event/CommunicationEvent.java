@@ -10,7 +10,10 @@ import javafx.event.EventType;
 public class CommunicationEvent extends Event {
 
     public static final EventType<CommunicationEvent> ALL = new EventType<>(EventType.ROOT, "ALL");
+    public static final EventType<CommunicationEvent> SCENE_CLOSE = new EventType<>(ALL, "SCENE_CLOSE");
     public static final EventType<CommunicationEvent> MANAGE_SUCCESS = new EventType<>(ALL, "MANAGE_SUCCESS");
+    public static final EventType<CommunicationEvent> RELATE_FINISH = new EventType<>(ALL, "RELATE_FINISH");
+
 
     private final SystemNormalFile file;
 
